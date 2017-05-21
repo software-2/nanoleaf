@@ -28,7 +28,7 @@ POST http://<location_ip>/api/v1/new
 from nanoleaf import Aurora
 
 myAurora = Aurora("169.254.123.123", "5EvbR2FjfmYfAkEtOkEnolnZbe6qOB")
-myAurura.on()
+myAurora.on()
 myAurora.effect("Violets Are Blue")
 ```
 
