@@ -1,5 +1,72 @@
 import requests
 import random
+import socket
+import select
+import time
+
+
+class Setup(object):
+
+    def findAuroras(self):
+        """
+        Returns a list of the IP addresses of all Auroras found on the network
+        
+        Discovery will take about 90 seconds.
+        """
+        SSDP_IP = "239.255.255.250"
+        SSDP_PORT = 1900
+        SSDP_MX = 3
+        SSDP_ST = "nanoleaf_aurora:light"
+
+        req = ['M-SEARCH * HTTP/1.1',
+               'HOST: ' + SSDP_IP + ':' + str(SSDP_PORT),
+               'MAN: "ssdp:discover"',
+               'ST: ' + SSDP_ST,
+               'MX: ' + str(SSDP_MX)]
+        req = '\r\n'.join(req).encode('utf-8')
+
+        auroraLocations = []
+        def checkIfNewAurora(response):
+            if not SSDP_ST in response:
+                return
+            for line in response.split("\n"):
+                if "Location:" in line:
+                    newLocation = line.replace("Location:", "").strip() \
+                                      .replace("http://", "") \
+                                      .replace(":16021", "")
+                    if not newLocation in auroraLocations:
+                        auroraLocations.append(newLocation)
+                        print("New Aurora found at " + newLocation)
+                    return
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, SSDP_MX)
+        sock.bind((socket.gethostname(), 9090))
+        sock.sendto(req, (SSDP_IP, SSDP_PORT))
+        sock.setblocking(False)
+
+        seekTime = 90
+        timeout = time.time() + seekTime
+        print("Starting discovery. This will continue for " + str(seekTime) + " seconds.")
+        while time.time() < timeout:
+            try:
+                ready = select.select([sock], [], [], 5)
+                if ready[0]:
+                    response = sock.recv(1024).decode("utf-8")
+                    checkIfNewAurora(response)
+            except socket.error as err:
+                print("Socket error while discovering SSDP devices!")
+                print(err)
+                print("If you are sure your network connection is working, please post an issue on the GitHub page: https://github.com/software-2/nanoleaf/issues")
+                print("Please include as much information as possible, including your OS, how your computer is connected to your network, etc.")
+                sock.close()
+                break
+
+        if len(auroraLocations) == 0:
+            print("Discovery complete, but no Auroras found!")
+            return auroraLocations
+        print("Discovery complete! Found " + str(len(auroraLocations)) + " Auroras.")
+        return auroraLocations
 
 class Aurora(object):
     def __init__(self, ipAddress, authToken):
@@ -12,13 +79,21 @@ class Aurora(object):
 
     def __put(self, endpoint, data):
         url = self.baseUrl + endpoint
-        return requests.put(url, json = data)
+        try:
+            return requests.put(url, json = data)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return
 
     def __get(self, endpoint=None):
         url = self.baseUrl
         if (endpoint is not None):
             url = self.baseUrl + endpoint
-        return requests.get(url)
+        try:
+            return requests.get(url)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return
 
     def getInfo(self):
         """Returns the full Aurora Info request. 
