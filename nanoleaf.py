@@ -68,6 +68,28 @@ class Setup(object):
         print("Discovery complete! Found " + str(len(auroraLocations)) + " Auroras.")
         return auroraLocations
 
+    def generateAuthToken(self, ipAddress):
+        '''
+        Generates an auth token for the Aurora at the given IP address. 
+        
+        You must first press and hold the power button on the Aurora for about 5-7 seconds, until the white LED flashes briefly.
+        '''
+        url = "http://" + ipAddress + ":16021/api/v1/new"
+        r = requests.post(url)
+        code = r.status_code
+        if code == 200:
+            print("Auth token for "  + ipAddress + " successfully generated!   " + str(r.json()))
+            return r.json()['auth_token']
+        if r.status_code == 401:
+            print("Not Authorized! I don't even know how this happens. Please post an issue on the GitHub page: https://github.com/software-2/nanoleaf/issues")
+        if r.status_code == 403:
+            print("Forbidden! Press and hold the power button for 5-7 seconds first! (Light will begin flashing)")
+        if r.status_code == 422:
+            print("Unprocessable Entity! I'm blaming your network on this one.")
+        return None
+
+
+
 class Aurora(object):
     def __init__(self, ipAddress, authToken):
         self.baseUrl = "http://" + ipAddress + ":16021/api/v1/" + authToken + "/"
