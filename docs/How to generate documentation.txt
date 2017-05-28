@@ -1,0 +1,6 @@
+This project uses pdoc, because it's easy and generates a nice human-readable document.
+http://pdoc.burntsushi.net/pdoc
+
+Windows example:
+python C:\Python36\Scripts\pdoc --html C:\Path\To\Nanoleaf\nanoleaf.py --overwrite
+

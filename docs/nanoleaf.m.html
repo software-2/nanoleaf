@@ -1068,6 +1068,16 @@ table {
   </ul>
 
         </li>
+        <li class="mono">
+        <span class="class_name"><a href="#nanoleaf.Setup">Setup</a></span>
+        
+          
+  <ul>
+    <li class="mono"><a href="#nanoleaf.Setup.findAuroras">findAuroras</a></li>
+    <li class="mono"><a href="#nanoleaf.Setup.generateAuthToken">generateAuthToken</a></li>
+  </ul>
+
+        </li>
       </ul>
     </li>
 
@@ -1089,6 +1099,96 @@ table {
   <div id="source-nanoleaf" class="source">
     <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">select</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<span class="k">class</span> <span class="nc">Setup</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">findAuroras</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of the IP addresses of all Auroras found on the network</span>
+<span class="sd">        </span>
+<span class="sd">        Discovery will take about 90 seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">SSDP_IP</span> <span class="o">=</span> <span class="s2">&quot;239.255.255.250&quot;</span>
+        <span class="n">SSDP_PORT</span> <span class="o">=</span> <span class="mi">1900</span>
+        <span class="n">SSDP_MX</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">SSDP_ST</span> <span class="o">=</span> <span class="s2">&quot;nanoleaf_aurora:light&quot;</span>
+
+        <span class="n">req</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;M-SEARCH * HTTP/1.1&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;HOST: &#39;</span> <span class="o">+</span> <span class="n">SSDP_IP</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">SSDP_PORT</span><span class="p">),</span>
+               <span class="s1">&#39;MAN: &quot;ssdp:discover&quot;&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ST: &#39;</span> <span class="o">+</span> <span class="n">SSDP_ST</span><span class="p">,</span>
+               <span class="s1">&#39;MX: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">SSDP_MX</span><span class="p">)]</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">req</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+        <span class="n">auroraLocations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">def</span> <span class="nf">checkIfNewAurora</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">SSDP_ST</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s2">&quot;Location:&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">newLocation</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Location:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> \
+                                      <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> \
+                                      <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:16021&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">newLocation</span> <span class="ow">in</span> <span class="n">auroraLocations</span><span class="p">:</span>
+                        <span class="n">auroraLocations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newLocation</span><span class="p">)</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;New Aurora found at &quot;</span> <span class="o">+</span> <span class="n">newLocation</span><span class="p">)</span>
+                    <span class="k">return</span>
+
+        <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">IPPROTO_IP</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">IP_MULTICAST_TTL</span><span class="p">,</span> <span class="n">SSDP_MX</span><span class="p">)</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span> <span class="mi">9090</span><span class="p">))</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">(</span><span class="n">SSDP_IP</span><span class="p">,</span> <span class="n">SSDP_PORT</span><span class="p">))</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="n">seekTime</span> <span class="o">=</span> <span class="mi">90</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">seekTime</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Starting discovery. This will continue for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">seekTime</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; seconds.&quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ready</span> <span class="o">=</span> <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="n">sock</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="mi">5</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ready</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                    <span class="n">checkIfNewAurora</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Socket error while discovering SSDP devices!&quot;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;If you are sure your network connection is working, please post an issue on the GitHub page: https://github.com/software-2/nanoleaf/issues&quot;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Please include as much information as possible, including your OS, how your computer is connected to your network, etc.&quot;</span><span class="p">)</span>
+                <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">auroraLocations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Discovery complete, but no Auroras found!&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">auroraLocations</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Discovery complete! Found &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">auroraLocations</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; Auroras.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">auroraLocations</span>
+
+    <span class="k">def</span> <span class="nf">generateAuthToken</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Generates an auth token for the Aurora at the given IP address. </span>
+<span class="sd">        </span>
+<span class="sd">        You must first press and hold the power button on the Aurora for about 5-7 seconds, until the white LED flashes briefly.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot;:16021/api/v1/new&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Auth token for &quot;</span>  <span class="o">+</span> <span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot; successfully generated!   &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()))</span>
+            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;auth_token&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Not Authorized! I don&#39;t even know how this happens. Please post an issue on the GitHub page: https://github.com/software-2/nanoleaf/issues&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Forbidden! Press and hold the power button for 5-7 seconds first! (Light will begin flashing)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">422</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Unprocessable Entity! I&#39;m blaming your network on this one.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+
 
 <span class="k">class</span> <span class="nc">Aurora</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">,</span> <span class="n">authToken</span><span class="p">):</span>
@@ -1101,13 +1201,21 @@ table {
 
     <span class="k">def</span> <span class="nf">__put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
-        <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">__get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">endpoint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
             <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
-        <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">getInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the full Aurora Info request. </span>
@@ -1211,13 +1319,21 @@ table {
 
     <span class="k">def</span> <span class="nf">__put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
-        <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">__get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">endpoint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
             <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
-        <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">getInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the full Aurora Info request. </span>
@@ -1726,6 +1842,229 @@ table {
 </div>
 
             </div>
+      </div>
+      </div>
+      
+      <div class="item">
+      <p id="nanoleaf.Setup" class="name">class <span class="ident">Setup</span></p>
+      
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Setup', this);">Show source &equiv;</a></p>
+  <div id="source-nanoleaf.Setup" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Setup</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">findAuroras</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of the IP addresses of all Auroras found on the network</span>
+<span class="sd">        </span>
+<span class="sd">        Discovery will take about 90 seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">SSDP_IP</span> <span class="o">=</span> <span class="s2">&quot;239.255.255.250&quot;</span>
+        <span class="n">SSDP_PORT</span> <span class="o">=</span> <span class="mi">1900</span>
+        <span class="n">SSDP_MX</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">SSDP_ST</span> <span class="o">=</span> <span class="s2">&quot;nanoleaf_aurora:light&quot;</span>
+
+        <span class="n">req</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;M-SEARCH * HTTP/1.1&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;HOST: &#39;</span> <span class="o">+</span> <span class="n">SSDP_IP</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">SSDP_PORT</span><span class="p">),</span>
+               <span class="s1">&#39;MAN: &quot;ssdp:discover&quot;&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ST: &#39;</span> <span class="o">+</span> <span class="n">SSDP_ST</span><span class="p">,</span>
+               <span class="s1">&#39;MX: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">SSDP_MX</span><span class="p">)]</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">req</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+        <span class="n">auroraLocations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">def</span> <span class="nf">checkIfNewAurora</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">SSDP_ST</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s2">&quot;Location:&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">newLocation</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Location:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> \
+                                      <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> \
+                                      <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:16021&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">newLocation</span> <span class="ow">in</span> <span class="n">auroraLocations</span><span class="p">:</span>
+                        <span class="n">auroraLocations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newLocation</span><span class="p">)</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;New Aurora found at &quot;</span> <span class="o">+</span> <span class="n">newLocation</span><span class="p">)</span>
+                    <span class="k">return</span>
+
+        <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">IPPROTO_IP</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">IP_MULTICAST_TTL</span><span class="p">,</span> <span class="n">SSDP_MX</span><span class="p">)</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span> <span class="mi">9090</span><span class="p">))</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">(</span><span class="n">SSDP_IP</span><span class="p">,</span> <span class="n">SSDP_PORT</span><span class="p">))</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="n">seekTime</span> <span class="o">=</span> <span class="mi">90</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">seekTime</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Starting discovery. This will continue for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">seekTime</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; seconds.&quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ready</span> <span class="o">=</span> <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="n">sock</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="mi">5</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ready</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                    <span class="n">checkIfNewAurora</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Socket error while discovering SSDP devices!&quot;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;If you are sure your network connection is working, please post an issue on the GitHub page: https://github.com/software-2/nanoleaf/issues&quot;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Please include as much information as possible, including your OS, how your computer is connected to your network, etc.&quot;</span><span class="p">)</span>
+                <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">auroraLocations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Discovery complete, but no Auroras found!&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">auroraLocations</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Discovery complete! Found &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">auroraLocations</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; Auroras.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">auroraLocations</span>
+
+    <span class="k">def</span> <span class="nf">generateAuthToken</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Generates an auth token for the Aurora at the given IP address. </span>
+<span class="sd">        </span>
+<span class="sd">        You must first press and hold the power button on the Aurora for about 5-7 seconds, until the white LED flashes briefly.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot;:16021/api/v1/new&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Auth token for &quot;</span>  <span class="o">+</span> <span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot; successfully generated!   &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()))</span>
+            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;auth_token&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Not Authorized! I don&#39;t even know how this happens. Please post an issue on the GitHub page: https://github.com/software-2/nanoleaf/issues&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Forbidden! Press and hold the power button for 5-7 seconds first! (Light will begin flashing)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">422</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Unprocessable Entity! I&#39;m blaming your network on this one.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+
+  </div>
+</div>
+
+
+      <div class="class">
+          <h3>Ancestors (in MRO)</h3>
+          <ul class="class_list">
+          <li><a href="#nanoleaf.Setup">Setup</a></li>
+          <li>builtins.object</li>
+          </ul>
+          <h3>Static methods</h3>
+            
+  <div class="item">
+    <div class="name def" id="nanoleaf.Setup.findAuroras">
+    <p>def <span class="ident">findAuroras</span>(</p><p>self)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns a list of the IP addresses of all Auroras found on the network</p>
+<p>Discovery will take about 90 seconds.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Setup.findAuroras', this);">Show source &equiv;</a></p>
+  <div id="source-nanoleaf.Setup.findAuroras" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">findAuroras</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a list of the IP addresses of all Auroras found on the network</span>
+<span class="sd">    </span>
+<span class="sd">    Discovery will take about 90 seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SSDP_IP</span> <span class="o">=</span> <span class="s2">&quot;239.255.255.250&quot;</span>
+    <span class="n">SSDP_PORT</span> <span class="o">=</span> <span class="mi">1900</span>
+    <span class="n">SSDP_MX</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">SSDP_ST</span> <span class="o">=</span> <span class="s2">&quot;nanoleaf_aurora:light&quot;</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;M-SEARCH * HTTP/1.1&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;HOST: &#39;</span> <span class="o">+</span> <span class="n">SSDP_IP</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">SSDP_PORT</span><span class="p">),</span>
+           <span class="s1">&#39;MAN: &quot;ssdp:discover&quot;&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;ST: &#39;</span> <span class="o">+</span> <span class="n">SSDP_ST</span><span class="p">,</span>
+           <span class="s1">&#39;MX: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">SSDP_MX</span><span class="p">)]</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">req</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="n">auroraLocations</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">def</span> <span class="nf">checkIfNewAurora</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SSDP_ST</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;Location:&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">newLocation</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Location:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> \
+                                  <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> \
+                                  <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:16021&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">newLocation</span> <span class="ow">in</span> <span class="n">auroraLocations</span><span class="p">:</span>
+                    <span class="n">auroraLocations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newLocation</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;New Aurora found at &quot;</span> <span class="o">+</span> <span class="n">newLocation</span><span class="p">)</span>
+                <span class="k">return</span>
+    <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
+    <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">IPPROTO_IP</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">IP_MULTICAST_TTL</span><span class="p">,</span> <span class="n">SSDP_MX</span><span class="p">)</span>
+    <span class="n">sock</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span> <span class="mi">9090</span><span class="p">))</span>
+    <span class="n">sock</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="p">(</span><span class="n">SSDP_IP</span><span class="p">,</span> <span class="n">SSDP_PORT</span><span class="p">))</span>
+    <span class="n">sock</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">seekTime</span> <span class="o">=</span> <span class="mi">90</span>
+    <span class="n">timeout</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">seekTime</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Starting discovery. This will continue for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">seekTime</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; seconds.&quot;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ready</span> <span class="o">=</span> <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="n">sock</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="mi">5</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ready</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                <span class="n">checkIfNewAurora</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Socket error while discovering SSDP devices!&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;If you are sure your network connection is working, please post an issue on the GitHub page: https://github.com/software-2/nanoleaf/issues&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Please include as much information as possible, including your OS, how your computer is connected to your network, etc.&quot;</span><span class="p">)</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">break</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">auroraLocations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Discovery complete, but no Auroras found!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">auroraLocations</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Discovery complete! Found &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">auroraLocations</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; Auroras.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">auroraLocations</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="nanoleaf.Setup.generateAuthToken">
+    <p>def <span class="ident">generateAuthToken</span>(</p><p>self, ipAddress)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Generates an auth token for the Aurora at the given IP address. </p>
+<p>You must first press and hold the power button on the Aurora for about 5-7 seconds, until the white LED flashes briefly.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Setup.generateAuthToken', this);">Show source &equiv;</a></p>
+  <div id="source-nanoleaf.Setup.generateAuthToken" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">generateAuthToken</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generates an auth token for the Aurora at the given IP address. </span>
+<span class="sd">    </span>
+<span class="sd">    You must first press and hold the power button on the Aurora for about 5-7 seconds, until the white LED flashes briefly.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot;:16021/api/v1/new&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span>
+    <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Auth token for &quot;</span>  <span class="o">+</span> <span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot; successfully generated!   &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;auth_token&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Not Authorized! I don&#39;t even know how this happens. Please post an issue on the GitHub page: https://github.com/software-2/nanoleaf/issues&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Forbidden! Press and hold the power button for 5-7 seconds first! (Light will begin flashing)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">422</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Unprocessable Entity! I&#39;m blaming your network on this one.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
       </div>
       </div>
 
