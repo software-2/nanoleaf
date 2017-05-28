@@ -8,7 +8,7 @@ This module aims to do more than just act as a wrapper for API calls. It provide
 ### Support The Project ###
 
 This is a pet project, and I'm doing it because I need API support just as badly as you do. But, if it really does make your life better, I'd appreciate a cup of coffee.
-```Donate
+```
 BTC: 1Gr31rgb6UXEdXwbwQGUsadcd7AnY7okXT
 LTC: Lajqnm28UipLbzJqvyy4tRQFf39xQy6B48
 ```
