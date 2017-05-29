@@ -1128,7 +1128,6 @@ table {
         <span class="k">def</span> <span class="nf">checkIfNewAurora</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">SSDP_ST</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
                 <span class="k">return</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="s2">&quot;Location:&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                     <span class="n">newLocation</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Location:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> \
@@ -1876,7 +1875,6 @@ table {
         <span class="k">def</span> <span class="nf">checkIfNewAurora</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">SSDP_ST</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
                 <span class="k">return</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="s2">&quot;Location:&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                     <span class="n">newLocation</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Location:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> \
@@ -1982,7 +1980,6 @@ table {
     <span class="k">def</span> <span class="nf">checkIfNewAurora</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">SSDP_ST</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
             <span class="k">return</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="s2">&quot;Location:&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                 <span class="n">newLocation</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Location:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> \
