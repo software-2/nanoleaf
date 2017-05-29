@@ -1,2 +1,3 @@
-/makeDocumentation.bat
-__pycache__/*
+dist/*
+old-dist/*
+/MANIFEST

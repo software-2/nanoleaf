@@ -13,6 +13,14 @@ BTC: 1Gr31rgb6UXEdXwbwQGUsadcd7AnY7okXT
 LTC: Lajqnm28UipLbzJqvyy4tRQFf39xQy6B48
 ```
 
+## Install ##
+
+It's super easy - just use pip to get the latest version.
+
+```
+pip install nanoleaf --upgrade
+```
+
 ## Setup ##
 
 There are two pieces of information you'll need to control your Aurora: The IP address and an auth token.
