@@ -1044,8 +1044,8 @@ table {
     <li class="set"><h3><a href="#header-functions">Functions</a></h3>
       
   <ul>
-    <li class="mono"><a href="#nanoleaf.Setup.findAuroras">findAuroras</a></li>
-    <li class="mono"><a href="#nanoleaf.Setup.generateAuthToken">generateAuthToken</a></li>
+    <li class="mono"><a href="#nanoleaf.Setup.find_auroras">find_auroras</a></li>
+    <li class="mono"><a href="#nanoleaf.Setup.generate_auth_token">generate_auth_token</a></li>
   </ul>
 
     </li>
@@ -1076,7 +1076,7 @@ table {
 <span class="c1"># For instructions or bug reports, please visit</span>
 <span class="c1"># https://github.com/software-2/nanoleaf</span>
 
-<span class="k">def</span> <span class="nf">findAuroras</span><span class="p">(</span><span class="n">seek_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">find_auroras</span><span class="p">(</span><span class="n">seek_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a list of the IP addresses of all Auroras found on the network</span>
 <span class="sd">    </span>
@@ -1137,7 +1137,7 @@ table {
     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Discovery complete! Found &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">auroraLocations</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; Auroras.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">auroraLocations</span>
 
-<span class="k">def</span> <span class="nf">generateAuthToken</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">generate_auth_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Generates an auth token for the Aurora at the given IP address. </span>
 <span class="sd">    </span>
@@ -1166,8 +1166,8 @@ table {
     <h2 class="section-title" id="header-functions">Functions</h2>
       
   <div class="item">
-    <div class="name def" id="nanoleaf.Setup.findAuroras">
-    <p>def <span class="ident">findAuroras</span>(</p><p>seek_time=30)</p>
+    <div class="name def" id="nanoleaf.Setup.find_auroras">
+    <p>def <span class="ident">find_auroras</span>(</p><p>seek_time=30)</p>
     </div>
     
 
@@ -1177,9 +1177,9 @@ table {
 <p>Discovery will take about 30 seconds by default.
 If your Auroras are not found, try increasing the seek time to 90 seconds.</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Setup.findAuroras', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Setup.findAuroras" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">findAuroras</span><span class="p">(</span><span class="n">seek_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Setup.find_auroras', this);">Show source &equiv;</a></p>
+  <div id="source-nanoleaf.Setup.find_auroras" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">find_auroras</span><span class="p">(</span><span class="n">seek_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a list of the IP addresses of all Auroras found on the network</span>
 <span class="sd">    </span>
@@ -1248,8 +1248,8 @@ If your Auroras are not found, try increasing the seek time to 90 seconds.</p></
   
       
   <div class="item">
-    <div class="name def" id="nanoleaf.Setup.generateAuthToken">
-    <p>def <span class="ident">generateAuthToken</span>(</p><p>self, ipAddress)</p>
+    <div class="name def" id="nanoleaf.Setup.generate_auth_token">
+    <p>def <span class="ident">generate_auth_token</span>(</p><p>self, ipAddress)</p>
     </div>
     
 
@@ -1258,9 +1258,9 @@ If your Auroras are not found, try increasing the seek time to 90 seconds.</p></
     <div class="desc"><p>Generates an auth token for the Aurora at the given IP address. </p>
 <p>You must first press and hold the power button on the Aurora for about 5-7 seconds, until the white LED flashes briefly.</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Setup.generateAuthToken', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Setup.generateAuthToken" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">generateAuthToken</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Setup.generate_auth_token', this);">Show source &equiv;</a></p>
+  <div id="source-nanoleaf.Setup.generate_auth_token" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">generate_auth_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Generates an auth token for the Aurora at the given IP address. </span>
 <span class="sd">    </span>

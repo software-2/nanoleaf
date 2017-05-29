@@ -33,7 +33,7 @@ After about 90 seconds, this will return a list of the IP address of every Auror
 ```python
 from nanoleaf import Setup
 
-ipAddressList = Setup.findAuroras()
+ipAddressList = Setup.find_auroras()
 ```
 
 ### Generate Auth Token ###
@@ -43,7 +43,7 @@ To generate an auth token, you must first press and hold the power button on the
 ```python
 from nanoleaf import Setup
 
-token = Setup.generateAuthToken("192.168.1.129")
+token = Setup.generate_auth_token("192.168.1.129")
 ```
 
 Be sure to store this auth token somewhere for future use. If you lose this token, you'll have to generate another. Personally, I just keep it in the scripts I've written that call this library. 
@@ -53,7 +53,7 @@ Be sure to store this auth token somewhere for future use. If you lose this toke
 ### Turn on and set to an effect ###
 
 ```python
-from nanoleaf.Aurora import Aurora
+from nanoleaf import Aurora
 
 myAurora = Aurora("169.254.123.123", "5EvbR2FjfmYfAkEtOkEnolnZbe6qOB")
 myAurora.on()
