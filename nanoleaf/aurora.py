@@ -192,27 +192,27 @@ class Aurora(object):
     @property
     def saturation(self):
         """Returns the saturation of the device (0-100)"""
-        return self.__get("state/saturation/value")
+        return self.__get("state/sat/value")
 
     @saturation.setter
     def saturation(self, level):
         """Sets the saturation to the given level (0-100)"""
-        data = {"saturation": {"value": level}}
+        data = {"sat": {"value": level}}
         self.__put("state", data)
 
     @property
     def saturation_min(self):
         """Returns the minimum saturation possible. (This always returns 0)"""
-        return self.__get("state/saturation/min")
+        return self.__get("state/sat/min")
 
     @property
     def saturation_max(self):
         """Returns the maximum saturation possible. (This always returns 100)"""
-        return self.__get("state/saturation/max")
+        return self.__get("state/sat/max")
 
     def saturation_raise(self, level):
         """Raise the saturation of the device by a relative amount (negative lowers saturation)"""
-        data = {"saturation": {"increment": level}}
+        data = {"sat": {"increment": level}}
         self.__put("state", data)
 
     def saturation_lower(self, level):
