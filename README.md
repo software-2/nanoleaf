@@ -31,9 +31,9 @@ For most people, the IP address that the Aurora uses to communicate is the one a
 After about 90 seconds, this will return a list of the IP address of every Aurora found on the network.
 
 ```python
-from nanoleaf import Setup
+from nanoleaf import setup
 
-ipAddressList = Setup.find_auroras()
+ipAddressList = setup.find_auroras()
 ```
 
 ### Generate Auth Token ###
@@ -41,9 +41,9 @@ ipAddressList = Setup.find_auroras()
 To generate an auth token, you must first press and hold the power button on the Aurora for about 5-7 seconds, until the white LED flashes briefly. Then, call the Setup class like so:
 
 ```python
-from nanoleaf import Setup
+from nanoleaf import setup
 
-token = Setup.generate_auth_token("192.168.1.129")
+token = setup.generate_auth_token("192.168.1.129")
 ```
 
 Be sure to store this auth token somewhere for future use. If you lose this token, you'll have to generate another. Personally, I just keep it in the scripts I've written that call this library. 
