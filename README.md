@@ -55,18 +55,68 @@ Be sure to store this auth token somewhere for future use. If you lose this toke
 ```python
 from nanoleaf import Aurora
 
-myAurora = Aurora("169.254.123.123", "5EvbR2FjfmYfAkEtOkEnolnZbe6qOB")
-myAurora.on()
-myAurora.effect("Violets Are Blue")
+my_aurora = Aurora("169.254.123.123", "5EvbR2FjfmYfAkEtOkEnolnZbe6qOB")
+my_aurora.on = True
+my_aurora.effect = "Violets Are Blue"
 ```
 
 ### Set multiple Auroras to the same random effect ###
 
 ```python
-leftSide = Aurora("192.168.1.56", "5EvbR2FjfmYfAkEtOkEnolnZbe6qOB")
-rightSide = Aurora("192.168.1.78", "fAkeR2FjfmYfAkEtOkEnolnZtOkEn")
-leftSide.on()
-rightSide.on()
-rightSide.effectRandom()
-leftSide.effect(rightSide.getEffect())
+left_side = Aurora("192.168.1.56", "5EvbR2FjfmYfAkEtOkEnolnZbe6qOB")
+right_side = Aurora("192.168.1.78", "fAkeR2FjfmYfAkEtOkEnolnZtOkEn")
+right_side.effect_random()
+left_side.effect = rightSide.effect
+```
+
+### Add a new effect ###
+
+Presently, you must create your own raw dict that exactly matches the structure found on the [API documentation](http://forum.nanoleaf.me/docs/openapi#_e5qyi8m8u68). Methods of making this much easier are planned for future updates.
+
+``` python
+effect_data = {
+    "command": "add",
+    "animName": "My Random Animation",
+    "animType": "random",
+    "colorType": "HSB",
+    "animData": None,
+    "palette": [
+        {
+            "hue": 0,
+            "saturation": 100,
+            "brightness": 100
+        },
+        {
+            "hue": 120,
+            "saturation": 100,
+            "brightness": 100
+        },
+        {
+            "hue": 240,
+            "saturation": 100,
+            "brightness": 100
+        }
+    ],
+    "brightnessRange": {
+        "minValue": 25,
+        "maxValue": 100
+    },
+    "transTime": {
+        "minValue": 25,
+        "maxValue": 100
+    },
+    "delayTime": {
+        "minValue": 25,
+        "maxValue": 100
+    },
+    "loop": True
+}
+
+my_aurora.effect_add_raw(effect_data)
+```
+
+### Delete an effect ###
+
+``` python
+my_aurora.effect_delete("My Random Animation")
 ```

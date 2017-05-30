@@ -1,1 +1,1 @@
-from .Aurora import Aurora
+from .aurora import Aurora

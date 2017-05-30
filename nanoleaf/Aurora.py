@@ -44,7 +44,7 @@ class Aurora(object):
 
     def __check_for_errors(self, r: requests.request) -> requests.request:
         if r.status_code == 200:
-            if r.text == "": #BUG: Delete User returns 200, not 204 like it should, as of firmware 1.5.0
+            if r.text == "":  # BUG: Delete User returns 200, not 204 like it should, as of firmware 1.5.0
                 return None
             return r.json()
         elif r.status_code == 204:
@@ -80,6 +80,10 @@ class Aurora(object):
         """Returns the current color mode."""
         return self.__get("state/colorMode")
 
+    def identify(self):
+        """Briefly flash the panels on and off"""
+        self.__put("identify", {})
+
     def delete_user(self):
         """CAUTION: Revokes your auth token from the device."""
         self.__delete()
@@ -91,9 +95,7 @@ class Aurora(object):
     @property
     def on(self):
         """Returns True if the device is on, False if it's off"""
-        r = self.__get("state/on")
-        if r is not None:
-            return r["value"]
+        return self.__get("state/on/value")
 
     @on.setter
     def on(self, value: bool):
@@ -122,13 +124,12 @@ class Aurora(object):
     @property
     def brightness(self):
         """Returns the brightness of the device (0-100)"""
-        r = self.__get("state/brightness")
-        return r["value"]
+        return self.__get("state/brightness/value")
 
     @brightness.setter
     def brightness(self, level):
         """Sets the brightness to the given level (0-100)"""
-        data = {"brightness" : {"value": level}}
+        data = {"brightness": {"value": level}}
         self.__put("state", data)
 
     @property
@@ -143,7 +144,7 @@ class Aurora(object):
 
     def brightness_raise(self, level):
         """Raise the brightness of the device by a relative amount (negative lowers brightness)"""
-        data = {"brightness" : {"increment": level}}
+        data = {"brightness": {"increment": level}}
         self.__put("state", data)
 
     def brightness_lower(self, level):
@@ -157,13 +158,12 @@ class Aurora(object):
     @property
     def hue(self):
         """Returns the hue of the device (0-360)"""
-        r = self.__get("state/hue")
-        return r["value"]
+        return self.__get("state/hue/value")
 
     @hue.setter
     def hue(self, level):
         """Sets the hue to the given level (0-360)"""
-        data = {"hue" : {"value": level}}
+        data = {"hue": {"value": level}}
         self.__put("state", data)
 
     @property
@@ -178,7 +178,7 @@ class Aurora(object):
 
     def hue_raise(self, level):
         """Raise the hue of the device by a relative amount (negative lowers hue)"""
-        data = {"hue" : {"increment": level}}
+        data = {"hue": {"increment": level}}
         self.__put("state", data)
 
     def hue_lower(self, level):
@@ -192,13 +192,12 @@ class Aurora(object):
     @property
     def saturation(self):
         """Returns the saturation of the device (0-100)"""
-        r = self.__get("state/saturation")
-        return r["value"]
+        return self.__get("state/saturation/value")
 
     @saturation.setter
     def saturation(self, level):
         """Sets the saturation to the given level (0-100)"""
-        data = {"saturation" : {"value": level}}
+        data = {"saturation": {"value": level}}
         self.__put("state", data)
 
     @property
@@ -213,7 +212,7 @@ class Aurora(object):
 
     def saturation_raise(self, level):
         """Raise the saturation of the device by a relative amount (negative lowers saturation)"""
-        data = {"saturation" : {"increment": level}}
+        data = {"saturation": {"increment": level}}
         self.__put("state", data)
 
     def saturation_lower(self, level):
@@ -227,32 +226,31 @@ class Aurora(object):
     @property
     def color_temperature(self):
         """Returns the color temperature of the device (0-100)"""
-        r = self.__get("state/ct")
-        return r["value"]
+        return self.__get("state/ct/value")
 
     @color_temperature.setter
     def color_temperature(self, level):
         """Sets the color temperature to the given level (0-100)"""
-        data = {"ct" : {"value": level}}
+        data = {"ct": {"value": level}}
         self.__put("state", data)
 
     @property
     def color_temperature_min(self):
         """Returns the minimum color temperature possible. (This always returns 1200)"""
-        #return self.__get("state/ct/min")
+        # return self.__get("state/ct/min")
         # BUG: Firmware 1.5.0 returns the wrong value.
         return 1200
 
     @property
     def color_temperature_max(self):
         """Returns the maximum color temperature possible. (This always returns 6500)"""
-        #return self.__get("state/ct/max")
-        #BUG: Firmware 1.5.0 returns the wrong value.
+        # return self.__get("state/ct/max")
+        # BUG: Firmware 1.5.0 returns the wrong value.
         return 6500
 
     def color_temperature_raise(self, level):
         """Raise the color temperature of the device by a relative amount (negative lowers color temperature)"""
-        data = {"ct" : {"increment": level}}
+        data = {"ct": {"increment": level}}
         self.__put("state", data)
 
     def color_temperature_lower(self, level):
@@ -260,8 +258,50 @@ class Aurora(object):
         self.color_temperature_raise(-level)
 
     ###########################################
+    # Layout methods
+    ###########################################
+
+    @property
+    def orientation(self):
+        """Returns the orientation of the device (0-360)"""
+        return self.__get("panelLayout/globalOrientation/value")
+
+    @property
+    def orientation_min(self):
+        """Returns the minimum orientation possible. (This always returns 0)"""
+        return self.__get("panelLayout/globalOrientation/min")
+
+    @property
+    def orientation_max(self):
+        """Returns the maximum orientation possible. (This always returns 360)"""
+        return self.__get("panelLayout/globalOrientation/max")
+
+    @property
+    def panel_count(self):
+        """Returns the number of panels connected to the device"""
+        return self.__get("panelLayout/layout/numPanels")
+
+    @property
+    def panel_length(self):
+        """Returns the length of a single panel. (This always returns 150)"""
+        return self.__get("panelLayout/layout/sideLength")
+
+    @property
+    def panel_positions(self):
+        """Returns a list of all panels with their attributes represented in a dict.
+        
+        panelId - Unique identifier for this panel
+        x - X-coordinate
+        y - Y-coordinate
+        o - Rotational orientation
+        """
+        return self.__get("panelLayout/layout/positionData")
+
+    ###########################################
     # Effect methods
     ###########################################
+
+    _reserved_effect_names = ["*Static*", "*Dynamic*", "*Solid*"]
 
     @property
     def effect(self):
@@ -269,9 +309,9 @@ class Aurora(object):
         return self.__get("effects/select")
 
     @effect.setter
-    def effect(self, effectName):
+    def effect(self, effect_name: str):
         """Sets the active effect to the name specified"""
-        data = {"select" : effectName}
+        data = {"select": effect_name}
         self.__put("effects", data)
 
     @property
@@ -283,6 +323,37 @@ class Aurora(object):
         """Sets the active effect to a new random effect stored on the device"""
         effect_list = self.effects_list
         active_effect = self.effect
-        if active_effect != "*Solid*":
+        if active_effect not in self._reserved_effect_names:
             effect_list.remove(self.effect)
         self.effect = random.choice(effect_list)
+
+    def effect_set_raw(self, effect_data: dict):
+        """Sends a raw dict containing effect data to the device.
+
+        The dict given must match the json structure specified in the API docs."""
+        data = {"write": effect_data}
+        self.__put("effects", data)
+
+    def effect_details(self, name: str) -> dict:
+        """Returns the dict containing details for the effect specified"""
+        data = {"write": {"command": "request",
+                          "animName": name}}
+        return self.__put("effects", data)
+
+    def effect_details_all(self) -> dict:
+        """Returns a dict containing details for all effects on the device"""
+        data = {"write": {"command": "requestAll"}}
+        return self.__put("effects", data)
+
+    def effect_delete(self, name: str):
+        """Removed the specified effect from the device"""
+        data = {"write": {"command": "delete",
+                          "animName": name}}
+        self.__put("effects", data)
+
+    def effect_rename(self, old_name: str, new_name: str):
+        """Renames the specified effect saved on the device to a new name"""
+        data = {"write": {"command": "rename",
+                          "animName": old_name,
+                          "newName": new_name}}
+        self.__put("effects", data)

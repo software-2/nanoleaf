@@ -2,3 +2,4 @@ dist/*
 old-dist/*
 /MANIFEST
 /testfile.py
+.idea/*

@@ -3,7 +3,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
-    <title>nanoleaf.Aurora API documentation</title>
+    <title>aurora API documentation</title>
     <meta name="description" content="" />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
@@ -1045,26 +1045,28 @@ table {
     <li class="set"><h3><a href="#header-classes">Classes</a></h3>
       <ul>
         <li class="mono">
-        <span class="class_name"><a href="#nanoleaf.Aurora.Aurora">Aurora</a></span>
+        <span class="class_name"><a href="#aurora.Aurora">Aurora</a></span>
         
           
   <ul>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.__init__">__init__</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.brightness">brightness</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.brightnessLower">brightnessLower</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.brightnessRaise">brightnessRaise</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.effect">effect</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.effectRandom">effectRandom</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.getBrightness">getBrightness</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.getEffect">getEffect</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.getEffects">getEffects</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.getInfo">getInfo</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.getMaxBrightness">getMaxBrightness</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.getMinBrightness">getMinBrightness</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.getOn">getOn</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.off">off</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.on">on</a></li>
-    <li class="mono"><a href="#nanoleaf.Aurora.Aurora.toggleOn">toggleOn</a></li>
+    <li class="mono"><a href="#aurora.Aurora.__init__">__init__</a></li>
+    <li class="mono"><a href="#aurora.Aurora.brightness_lower">brightness_lower</a></li>
+    <li class="mono"><a href="#aurora.Aurora.brightness_raise">brightness_raise</a></li>
+    <li class="mono"><a href="#aurora.Aurora.color_temperature_lower">color_temperature_lower</a></li>
+    <li class="mono"><a href="#aurora.Aurora.color_temperature_raise">color_temperature_raise</a></li>
+    <li class="mono"><a href="#aurora.Aurora.delete_user">delete_user</a></li>
+    <li class="mono"><a href="#aurora.Aurora.effect_delete">effect_delete</a></li>
+    <li class="mono"><a href="#aurora.Aurora.effect_details">effect_details</a></li>
+    <li class="mono"><a href="#aurora.Aurora.effect_details_all">effect_details_all</a></li>
+    <li class="mono"><a href="#aurora.Aurora.effect_random">effect_random</a></li>
+    <li class="mono"><a href="#aurora.Aurora.effect_rename">effect_rename</a></li>
+    <li class="mono"><a href="#aurora.Aurora.effect_set_raw">effect_set_raw</a></li>
+    <li class="mono"><a href="#aurora.Aurora.hue_lower">hue_lower</a></li>
+    <li class="mono"><a href="#aurora.Aurora.hue_raise">hue_raise</a></li>
+    <li class="mono"><a href="#aurora.Aurora.identify">identify</a></li>
+    <li class="mono"><a href="#aurora.Aurora.on_toggle">on_toggle</a></li>
+    <li class="mono"><a href="#aurora.Aurora.saturation_lower">saturation_lower</a></li>
+    <li class="mono"><a href="#aurora.Aurora.saturation_raise">saturation_raise</a></li>
   </ul>
 
         </li>
@@ -1082,121 +1084,370 @@ table {
 
 
   <header id="section-intro">
-  <h1 class="title"><span class="name">nanoleaf.Aurora</span> module</h1>
+  <h1 class="title"><span class="name">aurora</span> module</h1>
   
   
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora" class="source">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora', this);">Show source &equiv;</a></p>
+  <div id="source-aurora" class="source">
     <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">socket</span>
-<span class="kn">import</span> <span class="nn">select</span>
-<span class="kn">import</span> <span class="nn">time</span>
 
 <span class="c1"># Primary interface for an Aurora light</span>
 <span class="c1"># For instructions or bug reports, please visit</span>
 <span class="c1"># https://github.com/software-2/nanoleaf</span>
 
+
 <span class="k">class</span> <span class="nc">Aurora</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">,</span> <span class="n">authToken</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot;:16021/api/v1/&quot;</span> <span class="o">+</span> <span class="n">authToken</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ipAddress</span> <span class="o">=</span> <span class="n">ipAddress</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">authToken</span> <span class="o">=</span> <span class="n">authToken</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;:16021/api/v1/&quot;</span> <span class="o">+</span> <span class="n">auth_token</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">=</span> <span class="n">ip_address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span> <span class="o">=</span> <span class="n">auth_token</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;&lt;Aurora(&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot;)&gt;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;Aurora(&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&gt;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_for_errors</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">endpoint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
+    <span class="k">def</span> <span class="nf">__get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_for_errors</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">getInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_for_errors</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__check_for_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>  <span class="c1"># BUG: Delete User returns 200, not 204 like it should, as of firmware 1.5.0</span>
+                <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">204</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error 400: Bad request! (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error 401: Not authorized! This is an invalid token for this Aurora (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error 404: Resource not found! (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">422</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error 422: Unprocessible Entity (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">500</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error 500: Internal Server Error (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;ERROR! UNKNOWN ERROR &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+                  <span class="o">+</span> <span class="s2">&quot;. Please post an issue on the GitHub page: https://github.com/software-2/nanoleaf/issues&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># General functionality methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the full Aurora Info request. </span>
 <span class="sd">        </span>
 <span class="sd">        Useful for debugging since it&#39;s just a fat dump.&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">()</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">()</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">color_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the current color mode.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/colorMode&quot;</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">identify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Briefly flash the panels on and off&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;identify&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
-    <span class="k">def</span> <span class="nf">getOn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;CAUTION: Revokes your auth token from the device.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__delete</span><span class="p">()</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># On / Off methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns True if the device is on, False if it&#39;s off&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/on&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-    <span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Turns on the device. Optional param to turn off if you hate using the off function&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/on/value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@on.setter</span>
+    <span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turns the device on/off. True = on, False = off&quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;on&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Turns off the device&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;on&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">toggleOn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if the device is off, False if it&#39;s on&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span>
+
+    <span class="nd">@off.setter</span>
+    <span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turns the device on/off. True = off, False = on&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">on_toggle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Switches the on/off state of the device&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">getOn</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span>
 
+    <span class="c1">###########################################</span>
+    <span class="c1"># Brightness methods</span>
+    <span class="c1">###########################################</span>
 
-
-    <span class="k">def</span> <span class="nf">getBrightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">brightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the brightness of the device (0-100)&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-    <span class="k">def</span> <span class="nf">getMaxBrightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the maximum brightness possible.</span>
-<span class="sd">        </span>
-<span class="sd">        No, I don&#39;t really know why...&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;max&quot;</span><span class="p">]</span>
-    <span class="k">def</span> <span class="nf">getMinBrightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the minimum brightness possible.&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;min&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness/value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@brightness.setter</span>
     <span class="k">def</span> <span class="nf">brightness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets the brightness to the given level (0-100)&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">brightnessRaise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">brightness_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the minimum brightness possible. (This always returns 0)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness/min&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">brightness_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum brightness possible. (This always returns 100)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness/max&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">brightness_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Raise the brightness of the device by a relative amount (negative lowers brightness)&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">brightnessLower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">brightness_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Lower the brightness of the device by a relative amount (negative raises brightness)&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">brightnessRaise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brightness_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
 
+    <span class="c1">###########################################</span>
+    <span class="c1"># Hue methods</span>
+    <span class="c1">###########################################</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the hue of the device (0-360)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/hue/value&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">getEffect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nd">@hue.setter</span>
+    <span class="k">def</span> <span class="nf">hue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the hue to the given level (0-360)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hue&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hue_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the minimum hue possible. (This always returns 0)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/hue/min&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hue_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum hue possible. (This always returns 360)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/hue/max&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">hue_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raise the hue of the device by a relative amount (negative lowers hue)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hue&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">hue_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Lower the hue of the device by a relative amount (negative raises hue)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hue_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># Saturation methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">saturation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the saturation of the device (0-100)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@saturation.setter</span>
+    <span class="k">def</span> <span class="nf">saturation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the saturation to the given level (0-100)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;saturation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">saturation_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the minimum saturation possible. (This always returns 0)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/min&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">saturation_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum saturation possible. (This always returns 100)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/max&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">saturation_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raise the saturation of the device by a relative amount (negative lowers saturation)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;saturation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">saturation_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Lower the saturation of the device by a relative amount (negative raises saturation)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saturation_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># Color Temperature methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">color_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the color temperature of the device (0-100)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/ct/value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@color_temperature.setter</span>
+    <span class="k">def</span> <span class="nf">color_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the color temperature to the given level (0-100)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ct&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">color_temperature_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the minimum color temperature possible. (This always returns 1200)&quot;&quot;&quot;</span>
+        <span class="c1"># return self.__get(&quot;state/ct/min&quot;)</span>
+        <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
+        <span class="k">return</span> <span class="mi">1200</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">color_temperature_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum color temperature possible. (This always returns 6500)&quot;&quot;&quot;</span>
+        <span class="c1"># return self.__get(&quot;state/ct/max&quot;)</span>
+        <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
+        <span class="k">return</span> <span class="mi">6500</span>
+
+    <span class="k">def</span> <span class="nf">color_temperature_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raise the color temperature of the device by a relative amount (negative lowers color temperature)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ct&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">color_temperature_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Lower the color temperature of the device by a relative amount (negative raises color temperature)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_temperature_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># Layout methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the orientation of the device (0-360)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/globalOrientation/value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">orientation_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the minimum orientation possible. (This always returns 0)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/globalOrientation/min&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">orientation_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum orientation possible. (This always returns 360)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/globalOrientation/max&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">panel_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the number of panels connected to the device&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/layout/numPanels&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">panel_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the length of a single panel. (This always returns 150)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/layout/sideLength&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">panel_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of all panels with their attributes represented in a dict.</span>
+<span class="sd">        </span>
+<span class="sd">        panelId - Unique identifier for this panel</span>
+<span class="sd">        x - X-coordinate</span>
+<span class="sd">        y - Y-coordinate</span>
+<span class="sd">        o - Rotational orientation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/layout/positionData&quot;</span><span class="p">)</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># Effect methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="n">_reserved_effect_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;*Static*&quot;</span><span class="p">,</span> <span class="s2">&quot;*Dynamic*&quot;</span><span class="p">,</span> <span class="s2">&quot;*Solid*&quot;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">effect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the active effect&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/select&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">getEffects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list of all effects stored on the device&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/effectsList&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">effect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effectName</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sets the active effect to the name specifiec&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;select&quot;</span> <span class="p">:</span> <span class="n">effectName</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/select&quot;</span><span class="p">)</span>
+
+    <span class="nd">@effect.setter</span>
+    <span class="k">def</span> <span class="nf">effect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the active effect to the name specified&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;select&quot;</span><span class="p">:</span> <span class="n">effect_name</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">effectRandom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">effects_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of all effects stored on the device&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/effectsList&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device&quot;&quot;&quot;</span>
-        <span class="n">effectList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEffects</span><span class="p">()</span>
-        <span class="n">effectList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getEffect</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">effect</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effectList</span><span class="p">))</span>
+        <span class="n">effect_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effects_list</span>
+        <span class="n">active_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect</span>
+        <span class="k">if</span> <span class="n">active_effect</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_effect_names</span><span class="p">:</span>
+            <span class="n">effect_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effect_list</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_set_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sends a raw dict containing effect data to the device.</span>
+
+<span class="sd">        The dict given must match the json structure specified in the API docs.&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="n">effect_data</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the dict containing details for the effect specified&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;request&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;animName&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">}}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_details_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a dict containing details for all effects on the device&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;requestAll&quot;</span><span class="p">}}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removed the specified effect from the device&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;delete&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;animName&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Renames the specified effect saved on the device to a new name&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;rename&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;animName&quot;</span><span class="p">:</span> <span class="n">old_name</span><span class="p">,</span>
+                          <span class="s2">&quot;newName&quot;</span><span class="p">:</span> <span class="n">new_name</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1209,112 +1460,363 @@ table {
     <h2 class="section-title" id="header-classes">Classes</h2>
       
       <div class="item">
-      <p id="nanoleaf.Aurora.Aurora" class="name">class <span class="ident">Aurora</span></p>
+      <p id="aurora.Aurora" class="name">class <span class="ident">Aurora</span></p>
       
   
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora" class="source">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora" class="source">
     <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Aurora</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">,</span> <span class="n">authToken</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot;:16021/api/v1/&quot;</span> <span class="o">+</span> <span class="n">authToken</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ipAddress</span> <span class="o">=</span> <span class="n">ipAddress</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">authToken</span> <span class="o">=</span> <span class="n">authToken</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;:16021/api/v1/&quot;</span> <span class="o">+</span> <span class="n">auth_token</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">=</span> <span class="n">ip_address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span> <span class="o">=</span> <span class="n">auth_token</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;&lt;Aurora(&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot;)&gt;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;Aurora(&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&gt;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_for_errors</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">endpoint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
+    <span class="k">def</span> <span class="nf">__get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_for_errors</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">getInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">+</span> <span class="n">endpoint</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_for_errors</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__check_for_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>  <span class="c1"># BUG: Delete User returns 200, not 204 like it should, as of firmware 1.5.0</span>
+                <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">204</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">403</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error 400: Bad request! (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error 401: Not authorized! This is an invalid token for this Aurora (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error 404: Resource not found! (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">422</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error 422: Unprocessible Entity (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">500</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error 500: Internal Server Error (&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;ERROR! UNKNOWN ERROR &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+                  <span class="o">+</span> <span class="s2">&quot;. Please post an issue on the GitHub page: https://github.com/software-2/nanoleaf/issues&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># General functionality methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the full Aurora Info request. </span>
 <span class="sd">        </span>
 <span class="sd">        Useful for debugging since it&#39;s just a fat dump.&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">()</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">()</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">color_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the current color mode.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/colorMode&quot;</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">identify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Briefly flash the panels on and off&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;identify&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
-    <span class="k">def</span> <span class="nf">getOn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;CAUTION: Revokes your auth token from the device.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__delete</span><span class="p">()</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># On / Off methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns True if the device is on, False if it&#39;s off&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/on&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-    <span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Turns on the device. Optional param to turn off if you hate using the off function&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/on/value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@on.setter</span>
+    <span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turns the device on/off. True = on, False = off&quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;on&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Turns off the device&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;on&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">toggleOn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if the device is off, False if it&#39;s on&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span>
+
+    <span class="nd">@off.setter</span>
+    <span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turns the device on/off. True = off, False = on&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">on_toggle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Switches the on/off state of the device&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">getOn</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span>
 
+    <span class="c1">###########################################</span>
+    <span class="c1"># Brightness methods</span>
+    <span class="c1">###########################################</span>
 
-
-    <span class="k">def</span> <span class="nf">getBrightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">brightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the brightness of the device (0-100)&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-    <span class="k">def</span> <span class="nf">getMaxBrightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the maximum brightness possible.</span>
-<span class="sd">        </span>
-<span class="sd">        No, I don&#39;t really know why...&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;max&quot;</span><span class="p">]</span>
-    <span class="k">def</span> <span class="nf">getMinBrightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the minimum brightness possible.&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;min&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness/value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@brightness.setter</span>
     <span class="k">def</span> <span class="nf">brightness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets the brightness to the given level (0-100)&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">brightnessRaise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">brightness_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the minimum brightness possible. (This always returns 0)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness/min&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">brightness_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum brightness possible. (This always returns 100)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness/max&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">brightness_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Raise the brightness of the device by a relative amount (negative lowers brightness)&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">brightnessLower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">brightness_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Lower the brightness of the device by a relative amount (negative raises brightness)&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">brightnessRaise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brightness_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
 
+    <span class="c1">###########################################</span>
+    <span class="c1"># Hue methods</span>
+    <span class="c1">###########################################</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the hue of the device (0-360)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/hue/value&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">getEffect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nd">@hue.setter</span>
+    <span class="k">def</span> <span class="nf">hue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the hue to the given level (0-360)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hue&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hue_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the minimum hue possible. (This always returns 0)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/hue/min&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hue_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum hue possible. (This always returns 360)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/hue/max&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">hue_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raise the hue of the device by a relative amount (negative lowers hue)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hue&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">hue_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Lower the hue of the device by a relative amount (negative raises hue)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hue_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># Saturation methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">saturation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the saturation of the device (0-100)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@saturation.setter</span>
+    <span class="k">def</span> <span class="nf">saturation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the saturation to the given level (0-100)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;saturation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">saturation_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the minimum saturation possible. (This always returns 0)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/min&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">saturation_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum saturation possible. (This always returns 100)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/max&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">saturation_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raise the saturation of the device by a relative amount (negative lowers saturation)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;saturation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">saturation_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Lower the saturation of the device by a relative amount (negative raises saturation)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saturation_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># Color Temperature methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">color_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the color temperature of the device (0-100)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/ct/value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@color_temperature.setter</span>
+    <span class="k">def</span> <span class="nf">color_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the color temperature to the given level (0-100)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ct&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">color_temperature_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the minimum color temperature possible. (This always returns 1200)&quot;&quot;&quot;</span>
+        <span class="c1"># return self.__get(&quot;state/ct/min&quot;)</span>
+        <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
+        <span class="k">return</span> <span class="mi">1200</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">color_temperature_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum color temperature possible. (This always returns 6500)&quot;&quot;&quot;</span>
+        <span class="c1"># return self.__get(&quot;state/ct/max&quot;)</span>
+        <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
+        <span class="k">return</span> <span class="mi">6500</span>
+
+    <span class="k">def</span> <span class="nf">color_temperature_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raise the color temperature of the device by a relative amount (negative lowers color temperature)&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ct&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">color_temperature_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Lower the color temperature of the device by a relative amount (negative raises color temperature)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_temperature_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># Layout methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the orientation of the device (0-360)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/globalOrientation/value&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">orientation_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the minimum orientation possible. (This always returns 0)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/globalOrientation/min&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">orientation_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the maximum orientation possible. (This always returns 360)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/globalOrientation/max&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">panel_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the number of panels connected to the device&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/layout/numPanels&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">panel_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the length of a single panel. (This always returns 150)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/layout/sideLength&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">panel_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of all panels with their attributes represented in a dict.</span>
+<span class="sd">        </span>
+<span class="sd">        panelId - Unique identifier for this panel</span>
+<span class="sd">        x - X-coordinate</span>
+<span class="sd">        y - Y-coordinate</span>
+<span class="sd">        o - Rotational orientation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;panelLayout/layout/positionData&quot;</span><span class="p">)</span>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># Effect methods</span>
+    <span class="c1">###########################################</span>
+
+    <span class="n">_reserved_effect_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;*Static*&quot;</span><span class="p">,</span> <span class="s2">&quot;*Dynamic*&quot;</span><span class="p">,</span> <span class="s2">&quot;*Solid*&quot;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">effect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the active effect&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/select&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">getEffects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list of all effects stored on the device&quot;&quot;&quot;</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/effectsList&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">effect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effectName</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sets the active effect to the name specifiec&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;select&quot;</span> <span class="p">:</span> <span class="n">effectName</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/select&quot;</span><span class="p">)</span>
+
+    <span class="nd">@effect.setter</span>
+    <span class="k">def</span> <span class="nf">effect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the active effect to the name specified&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;select&quot;</span><span class="p">:</span> <span class="n">effect_name</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">effectRandom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">effects_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of all effects stored on the device&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/effectsList&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device&quot;&quot;&quot;</span>
-        <span class="n">effectList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEffects</span><span class="p">()</span>
-        <span class="n">effectList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getEffect</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">effect</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effectList</span><span class="p">))</span>
+        <span class="n">effect_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effects_list</span>
+        <span class="n">active_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect</span>
+        <span class="k">if</span> <span class="n">active_effect</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_effect_names</span><span class="p">:</span>
+            <span class="n">effect_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effect_list</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_set_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sends a raw dict containing effect data to the device.</span>
+
+<span class="sd">        The dict given must match the json structure specified in the API docs.&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="n">effect_data</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the dict containing details for the effect specified&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;request&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;animName&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">}}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_details_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a dict containing details for all effects on the device&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;requestAll&quot;</span><span class="p">}}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removed the specified effect from the device&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;delete&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;animName&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">effect_rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Renames the specified effect saved on the device to a new name&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;rename&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;animName&quot;</span><span class="p">:</span> <span class="n">old_name</span><span class="p">,</span>
+                          <span class="s2">&quot;newName&quot;</span><span class="p">:</span> <span class="n">new_name</span><span class="p">}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1324,14 +1826,14 @@ table {
       <div class="class">
           <h3>Ancestors (in MRO)</h3>
           <ul class="class_list">
-          <li><a href="#nanoleaf.Aurora.Aurora">Aurora</a></li>
+          <li><a href="#aurora.Aurora">Aurora</a></li>
           <li>builtins.object</li>
           </ul>
           <h3>Static methods</h3>
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.__init__">
-    <p>def <span class="ident">__init__</span>(</p><p>self, ipAddress, authToken)</p>
+    <div class="name def" id="aurora.Aurora.__init__">
+    <p>def <span class="ident">__init__</span>(</p><p>self, ip_address, auth_token)</p>
     </div>
     
 
@@ -1339,12 +1841,12 @@ table {
   
     <div class="desc"><p>Initialize self.  See help(type(self)) for accurate signature.</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.__init__', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.__init__" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipAddress</span><span class="p">,</span> <span class="n">authToken</span><span class="p">):</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">ipAddress</span> <span class="o">+</span> <span class="s2">&quot;:16021/api/v1/&quot;</span> <span class="o">+</span> <span class="n">authToken</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">ipAddress</span> <span class="o">=</span> <span class="n">ipAddress</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">authToken</span> <span class="o">=</span> <span class="n">authToken</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.__init__', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.__init__" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">baseUrl</span> <span class="o">=</span> <span class="s2">&quot;http://&quot;</span> <span class="o">+</span> <span class="n">ip_address</span> <span class="o">+</span> <span class="s2">&quot;:16021/api/v1/&quot;</span> <span class="o">+</span> <span class="n">auth_token</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">=</span> <span class="n">ip_address</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span> <span class="o">=</span> <span class="n">auth_token</span>
 </pre></div>
 
   </div>
@@ -1354,32 +1856,8 @@ table {
   
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.brightness">
-    <p>def <span class="ident">brightness</span>(</p><p>self, level)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p>Sets the brightness to the given level (0-100)</p></div>
-  <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.brightness', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.brightness" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">brightness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Sets the brightness to the given level (0-100)&quot;&quot;&quot;</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-</pre></div>
-
-  </div>
-</div>
-
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.brightnessLower">
-    <p>def <span class="ident">brightnessLower</span>(</p><p>self, level)</p>
+    <div class="name def" id="aurora.Aurora.brightness_lower">
+    <p>def <span class="ident">brightness_lower</span>(</p><p>self, level)</p>
     </div>
     
 
@@ -1387,11 +1865,11 @@ table {
   
     <div class="desc"><p>Lower the brightness of the device by a relative amount (negative raises brightness)</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.brightnessLower', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.brightnessLower" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">brightnessLower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.brightness_lower', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.brightness_lower" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">brightness_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Lower the brightness of the device by a relative amount (negative raises brightness)&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">brightnessRaise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">brightness_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1401,8 +1879,8 @@ table {
   
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.brightnessRaise">
-    <p>def <span class="ident">brightnessRaise</span>(</p><p>self, level)</p>
+    <div class="name def" id="aurora.Aurora.brightness_raise">
+    <p>def <span class="ident">brightness_raise</span>(</p><p>self, level)</p>
     </div>
     
 
@@ -1410,12 +1888,12 @@ table {
   
     <div class="desc"><p>Raise the brightness of the device by a relative amount (negative lowers brightness)</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.brightnessRaise', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.brightnessRaise" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">brightnessRaise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.brightness_raise', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.brightness_raise" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">brightness_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Raise the brightness of the device by a relative amount (negative lowers brightness)&quot;&quot;&quot;</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;brightness&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1425,20 +1903,91 @@ table {
   
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.effect">
-    <p>def <span class="ident">effect</span>(</p><p>self, effectName)</p>
+    <div class="name def" id="aurora.Aurora.color_temperature_lower">
+    <p>def <span class="ident">color_temperature_lower</span>(</p><p>self, level)</p>
     </div>
     
 
     
   
-    <div class="desc"><p>Sets the active effect to the name specifiec</p></div>
+    <div class="desc"><p>Lower the color temperature of the device by a relative amount (negative raises color temperature)</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.effect', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.effect" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effectName</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Sets the active effect to the name specifiec&quot;&quot;&quot;</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;select&quot;</span> <span class="p">:</span> <span class="n">effectName</span><span class="p">}</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.color_temperature_lower', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.color_temperature_lower" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">color_temperature_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lower the color temperature of the device by a relative amount (negative raises color temperature)&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">color_temperature_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="aurora.Aurora.color_temperature_raise">
+    <p>def <span class="ident">color_temperature_raise</span>(</p><p>self, level)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Raise the color temperature of the device by a relative amount (negative lowers color temperature)</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.color_temperature_raise', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.color_temperature_raise" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">color_temperature_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raise the color temperature of the device by a relative amount (negative lowers color temperature)&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ct&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="aurora.Aurora.delete_user">
+    <p>def <span class="ident">delete_user</span>(</p><p>self)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>CAUTION: Revokes your auth token from the device.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.delete_user', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.delete_user" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;CAUTION: Revokes your auth token from the device.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__delete</span><span class="p">()</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="aurora.Aurora.effect_delete">
+    <p>def <span class="ident">effect_delete</span>(</p><p>self, name)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Removed the specified effect from the device</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.effect_delete', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.effect_delete" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effect_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Removed the specified effect from the device&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;delete&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;animName&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">}}</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 
@@ -1449,8 +1998,57 @@ table {
   
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.effectRandom">
-    <p>def <span class="ident">effectRandom</span>(</p><p>self)</p>
+    <div class="name def" id="aurora.Aurora.effect_details">
+    <p>def <span class="ident">effect_details</span>(</p><p>self, name)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns the dict containing details for the effect specified</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.effect_details', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.effect_details" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effect_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the dict containing details for the effect specified&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;request&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;animName&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">}}</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="aurora.Aurora.effect_details_all">
+    <p>def <span class="ident">effect_details_all</span>(</p><p>self)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns a dict containing details for all effects on the device</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.effect_details_all', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.effect_details_all" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effect_details_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a dict containing details for all effects on the device&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;requestAll&quot;</span><span class="p">}}</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="aurora.Aurora.effect_random">
+    <p>def <span class="ident">effect_random</span>(</p><p>self)</p>
     </div>
     
 
@@ -1458,13 +2056,15 @@ table {
   
     <div class="desc"><p>Sets the active effect to a new random effect stored on the device</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.effectRandom', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.effectRandom" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effectRandom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.effect_random', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.effect_random" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device&quot;&quot;&quot;</span>
-    <span class="n">effectList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEffects</span><span class="p">()</span>
-    <span class="n">effectList</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getEffect</span><span class="p">())</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">effect</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effectList</span><span class="p">))</span>
+    <span class="n">effect_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effects_list</span>
+    <span class="n">active_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect</span>
+    <span class="k">if</span> <span class="n">active_effect</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_effect_names</span><span class="p">:</span>
+        <span class="n">effect_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effect_list</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1474,21 +2074,23 @@ table {
   
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.getBrightness">
-    <p>def <span class="ident">getBrightness</span>(</p><p>self)</p>
+    <div class="name def" id="aurora.Aurora.effect_rename">
+    <p>def <span class="ident">effect_rename</span>(</p><p>self, old_name, new_name)</p>
     </div>
     
 
     
   
-    <div class="desc"><p>Returns the brightness of the device (0-100)</p></div>
+    <div class="desc"><p>Renames the specified effect saved on the device to a new name</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.getBrightness', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.getBrightness" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">getBrightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the brightness of the device (0-100)&quot;&quot;&quot;</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.effect_rename', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.effect_rename" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effect_rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Renames the specified effect saved on the device to a new name&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;rename&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;animName&quot;</span><span class="p">:</span> <span class="n">old_name</span><span class="p">,</span>
+                      <span class="s2">&quot;newName&quot;</span><span class="p">:</span> <span class="n">new_name</span><span class="p">}}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1498,21 +2100,23 @@ table {
   
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.getEffect">
-    <p>def <span class="ident">getEffect</span>(</p><p>self)</p>
+    <div class="name def" id="aurora.Aurora.effect_set_raw">
+    <p>def <span class="ident">effect_set_raw</span>(</p><p>self, effect_data)</p>
     </div>
     
 
     
   
-    <div class="desc"><p>Returns the active effect</p></div>
+    <div class="desc"><p>Sends a raw dict containing effect data to the device.</p>
+<p>The dict given must match the json structure specified in the API docs.</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.getEffect', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.getEffect" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">getEffect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the active effect&quot;&quot;&quot;</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/select&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.effect_set_raw', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.effect_set_raw" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effect_set_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sends a raw dict containing effect data to the device.</span>
+<span class="sd">    The dict given must match the json structure specified in the API docs.&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="n">effect_data</span><span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;effects&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1522,21 +2126,20 @@ table {
   
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.getEffects">
-    <p>def <span class="ident">getEffects</span>(</p><p>self)</p>
+    <div class="name def" id="aurora.Aurora.hue_lower">
+    <p>def <span class="ident">hue_lower</span>(</p><p>self, level)</p>
     </div>
     
 
     
   
-    <div class="desc"><p>Returns a list of all effects stored on the device</p></div>
+    <div class="desc"><p>Lower the hue of the device by a relative amount (negative raises hue)</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.getEffects', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.getEffects" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">getEffects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a list of all effects stored on the device&quot;&quot;&quot;</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/effectsList&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.hue_lower', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.hue_lower" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">hue_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lower the hue of the device by a relative amount (negative raises hue)&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">hue_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1546,123 +2149,20 @@ table {
   
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.getInfo">
-    <p>def <span class="ident">getInfo</span>(</p><p>self)</p>
+    <div class="name def" id="aurora.Aurora.hue_raise">
+    <p>def <span class="ident">hue_raise</span>(</p><p>self, level)</p>
     </div>
     
 
     
   
-    <div class="desc"><p>Returns the full Aurora Info request. </p>
-<p>Useful for debugging since it's just a fat dump.</p></div>
+    <div class="desc"><p>Raise the hue of the device by a relative amount (negative lowers hue)</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.getInfo', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.getInfo" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">getInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the full Aurora Info request. </span>
-<span class="sd">    </span>
-<span class="sd">    Useful for debugging since it&#39;s just a fat dump.&quot;&quot;&quot;</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">()</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-</pre></div>
-
-  </div>
-</div>
-
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.getMaxBrightness">
-    <p>def <span class="ident">getMaxBrightness</span>(</p><p>self)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p>Returns the maximum brightness possible.</p>
-<p>No, I don't really know why...</p></div>
-  <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.getMaxBrightness', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.getMaxBrightness" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">getMaxBrightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the maximum brightness possible.</span>
-<span class="sd">    </span>
-<span class="sd">    No, I don&#39;t really know why...&quot;&quot;&quot;</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;max&quot;</span><span class="p">]</span>
-</pre></div>
-
-  </div>
-</div>
-
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.getMinBrightness">
-    <p>def <span class="ident">getMinBrightness</span>(</p><p>self)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p>Returns the minimum brightness possible.</p></div>
-  <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.getMinBrightness', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.getMinBrightness" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">getMinBrightness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the minimum brightness possible.&quot;&quot;&quot;</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/brightness&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;min&quot;</span><span class="p">]</span>
-</pre></div>
-
-  </div>
-</div>
-
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.getOn">
-    <p>def <span class="ident">getOn</span>(</p><p>self)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p>Returns True if the device is on, False if it's off</p></div>
-  <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.getOn', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.getOn" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">getOn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns True if the device is on, False if it&#39;s off&quot;&quot;&quot;</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/on&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
-</pre></div>
-
-  </div>
-</div>
-
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.off">
-    <p>def <span class="ident">off</span>(</p><p>self)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p>Turns off the device</p></div>
-  <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.off', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.off" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Turns off the device&quot;&quot;&quot;</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;on&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.hue_raise', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.hue_raise" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">hue_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raise the hue of the device by a relative amount (negative lowers hue)&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hue&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 
@@ -1673,21 +2173,20 @@ table {
   
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.on">
-    <p>def <span class="ident">on</span>(</p><p>self, value=True)</p>
+    <div class="name def" id="aurora.Aurora.identify">
+    <p>def <span class="ident">identify</span>(</p><p>self)</p>
     </div>
     
 
     
   
-    <div class="desc"><p>Turns on the device. Optional param to turn off if you hate using the off function</p></div>
+    <div class="desc"><p>Briefly flash the panels on and off</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.on', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.on" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">on</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Turns on the device. Optional param to turn off if you hate using the off function&quot;&quot;&quot;</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;on&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.identify', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.identify" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">identify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Briefly flash the panels on and off&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;identify&quot;</span><span class="p">,</span> <span class="p">{})</span>
 </pre></div>
 
   </div>
@@ -1697,8 +2196,8 @@ table {
   
             
   <div class="item">
-    <div class="name def" id="nanoleaf.Aurora.Aurora.toggleOn">
-    <p>def <span class="ident">toggleOn</span>(</p><p>self)</p>
+    <div class="name def" id="aurora.Aurora.on_toggle">
+    <p>def <span class="ident">on_toggle</span>(</p><p>self)</p>
     </div>
     
 
@@ -1706,11 +2205,58 @@ table {
   
     <div class="desc"><p>Switches the on/off state of the device</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-nanoleaf.Aurora.Aurora.toggleOn', this);">Show source &equiv;</a></p>
-  <div id="source-nanoleaf.Aurora.Aurora.toggleOn" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">toggleOn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.on_toggle', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.on_toggle" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">on_toggle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Switches the on/off state of the device&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">getOn</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">on</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="aurora.Aurora.saturation_lower">
+    <p>def <span class="ident">saturation_lower</span>(</p><p>self, level)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Lower the saturation of the device by a relative amount (negative raises saturation)</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.saturation_lower', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.saturation_lower" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">saturation_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lower the saturation of the device by a relative amount (negative raises saturation)&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">saturation_raise</span><span class="p">(</span><span class="o">-</span><span class="n">level</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+            
+  <div class="item">
+    <div class="name def" id="aurora.Aurora.saturation_raise">
+    <p>def <span class="ident">saturation_raise</span>(</p><p>self, level)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Raise the saturation of the device by a relative amount (negative lowers saturation)</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.saturation_raise', this);">Show source &equiv;</a></p>
+  <div id="source-aurora.Aurora.saturation_raise" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">saturation_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raise the saturation of the device by a relative amount (negative lowers saturation)&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;saturation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1720,7 +2266,7 @@ table {
   
           <h3>Instance variables</h3>
             <div class="item">
-            <p id="nanoleaf.Aurora.Aurora.authToken" class="name">var <span class="ident">authToken</span></p>
+            <p id="aurora.Aurora.auth_token" class="name">var <span class="ident">auth_token</span></p>
             
 
             
@@ -1730,7 +2276,7 @@ table {
 
             </div>
             <div class="item">
-            <p id="nanoleaf.Aurora.Aurora.baseUrl" class="name">var <span class="ident">baseUrl</span></p>
+            <p id="aurora.Aurora.baseUrl" class="name">var <span class="ident">baseUrl</span></p>
             
 
             
@@ -1740,11 +2286,280 @@ table {
 
             </div>
             <div class="item">
-            <p id="nanoleaf.Aurora.Aurora.ipAddress" class="name">var <span class="ident">ipAddress</span></p>
+            <p id="aurora.Aurora.brightness" class="name">var <span class="ident">brightness</span></p>
             
 
             
   
+    <div class="desc"><p>Returns the brightness of the device (0-100)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.brightness_max" class="name">var <span class="ident">brightness_max</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the maximum brightness possible. (This always returns 100)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.brightness_min" class="name">var <span class="ident">brightness_min</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the minimum brightness possible. (This always returns 0)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.color_mode" class="name">var <span class="ident">color_mode</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the current color mode.</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.color_temperature" class="name">var <span class="ident">color_temperature</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the color temperature of the device (0-100)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.color_temperature_max" class="name">var <span class="ident">color_temperature_max</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the maximum color temperature possible. (This always returns 6500)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.color_temperature_min" class="name">var <span class="ident">color_temperature_min</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the minimum color temperature possible. (This always returns 1200)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.effect" class="name">var <span class="ident">effect</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the active effect</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.effects_list" class="name">var <span class="ident">effects_list</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns a list of all effects stored on the device</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.hue" class="name">var <span class="ident">hue</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the hue of the device (0-360)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.hue_max" class="name">var <span class="ident">hue_max</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the maximum hue possible. (This always returns 360)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.hue_min" class="name">var <span class="ident">hue_min</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the minimum hue possible. (This always returns 0)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.info" class="name">var <span class="ident">info</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the full Aurora Info request. </p>
+<p>Useful for debugging since it's just a fat dump.</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.ip_address" class="name">var <span class="ident">ip_address</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.off" class="name">var <span class="ident">off</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns True if the device is off, False if it's on</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.on" class="name">var <span class="ident">on</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns True if the device is on, False if it's off</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.orientation" class="name">var <span class="ident">orientation</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the orientation of the device (0-360)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.orientation_max" class="name">var <span class="ident">orientation_max</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the maximum orientation possible. (This always returns 360)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.orientation_min" class="name">var <span class="ident">orientation_min</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the minimum orientation possible. (This always returns 0)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.panel_count" class="name">var <span class="ident">panel_count</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the number of panels connected to the device</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.panel_length" class="name">var <span class="ident">panel_length</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the length of a single panel. (This always returns 150)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.panel_positions" class="name">var <span class="ident">panel_positions</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns a list of all panels with their attributes represented in a dict.</p>
+<p>panelId - Unique identifier for this panel
+x - X-coordinate
+y - Y-coordinate
+o - Rotational orientation</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.saturation" class="name">var <span class="ident">saturation</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the saturation of the device (0-100)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.saturation_max" class="name">var <span class="ident">saturation_max</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the maximum saturation possible. (This always returns 100)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.saturation_min" class="name">var <span class="ident">saturation_min</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the minimum saturation possible. (This always returns 0)</p></div>
   <div class="source_cont">
 </div>
 
