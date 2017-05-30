@@ -1283,27 +1283,27 @@ table {
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">saturation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the saturation of the device (0-100)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/value&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/sat/value&quot;</span><span class="p">)</span>
 
     <span class="nd">@saturation.setter</span>
     <span class="k">def</span> <span class="nf">saturation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets the saturation to the given level (0-100)&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;saturation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">saturation_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the minimum saturation possible. (This always returns 0)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/min&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/sat/min&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">saturation_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the maximum saturation possible. (This always returns 100)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/max&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/sat/max&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">saturation_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Raise the saturation of the device by a relative amount (negative lowers saturation)&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;saturation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">saturation_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
@@ -1652,27 +1652,27 @@ table {
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">saturation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the saturation of the device (0-100)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/value&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/sat/value&quot;</span><span class="p">)</span>
 
     <span class="nd">@saturation.setter</span>
     <span class="k">def</span> <span class="nf">saturation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets the saturation to the given level (0-100)&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;saturation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">saturation_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the minimum saturation possible. (This always returns 0)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/min&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/sat/min&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">saturation_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the maximum saturation possible. (This always returns 100)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/saturation/max&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/sat/max&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">saturation_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Raise the saturation of the device by a relative amount (negative lowers saturation)&quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;saturation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">saturation_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
@@ -2255,7 +2255,7 @@ table {
   <div id="source-aurora.Aurora.saturation_raise" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">saturation_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Raise the saturation of the device by a relative amount (negative lowers saturation)&quot;&quot;&quot;</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;saturation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;increment&quot;</span><span class="p">:</span> <span class="n">level</span><span class="p">}}</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 
