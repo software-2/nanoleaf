@@ -1175,6 +1175,21 @@ table {
         <span class="sd">&quot;&quot;&quot;Briefly flash the panels on and off&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;identify&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">firmware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the firmware version of the device&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;firmwareVersion&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the model number of the device. (Always returns &#39;NL22&#39;)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">serial_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the serial number of the device&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;serialNo&quot;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;CAUTION: Revokes your auth token from the device.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delete</span><span class="p">()</span>
@@ -1328,16 +1343,16 @@ table {
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">color_temperature_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the minimum color temperature possible. (This always returns 1200)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/ct/min&quot;</span><span class="p">)</span>
+        <span class="c1"># return self.__get(&quot;state/ct/min&quot;)</span>
         <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
-        <span class="c1">#return 1200</span>
+        <span class="k">return</span> <span class="mi">1200</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">color_temperature_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the maximum color temperature possible. (This always returns 6500)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/ct/max&quot;</span><span class="p">)</span>
+        <span class="c1"># return self.__get(&quot;state/ct/max&quot;)</span>
         <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
-        <span class="c1">#return 6500</span>
+        <span class="k">return</span> <span class="mi">6500</span>
 
     <span class="k">def</span> <span class="nf">color_temperature_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Raise the color temperature of the device by a relative amount (negative lowers color temperature)&quot;&quot;&quot;</span>
@@ -1411,7 +1426,9 @@ table {
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/effectsList&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns the name of the new effect.&quot;&quot;&quot;</span>
         <span class="n">effect_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effects_list</span>
         <span class="n">active_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect</span>
         <span class="k">if</span> <span class="n">active_effect</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_effect_names</span><span class="p">:</span>
@@ -1546,6 +1563,21 @@ table {
         <span class="sd">&quot;&quot;&quot;Briefly flash the panels on and off&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__put</span><span class="p">(</span><span class="s2">&quot;identify&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">firmware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the firmware version of the device&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;firmwareVersion&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the model number of the device. (Always returns &#39;NL22&#39;)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">serial_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the serial number of the device&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;serialNo&quot;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;CAUTION: Revokes your auth token from the device.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delete</span><span class="p">()</span>
@@ -1699,16 +1731,16 @@ table {
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">color_temperature_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the minimum color temperature possible. (This always returns 1200)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/ct/min&quot;</span><span class="p">)</span>
+        <span class="c1"># return self.__get(&quot;state/ct/min&quot;)</span>
         <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
-        <span class="c1">#return 1200</span>
+        <span class="k">return</span> <span class="mi">1200</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">color_temperature_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the maximum color temperature possible. (This always returns 6500)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/ct/max&quot;</span><span class="p">)</span>
+        <span class="c1"># return self.__get(&quot;state/ct/max&quot;)</span>
         <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
-        <span class="c1">#return 6500</span>
+        <span class="k">return</span> <span class="mi">6500</span>
 
     <span class="k">def</span> <span class="nf">color_temperature_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Raise the color temperature of the device by a relative amount (negative lowers color temperature)&quot;&quot;&quot;</span>
@@ -1782,7 +1814,9 @@ table {
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/effectsList&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns the name of the new effect.&quot;&quot;&quot;</span>
         <span class="n">effect_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effects_list</span>
         <span class="n">active_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect</span>
         <span class="k">if</span> <span class="n">active_effect</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_effect_names</span><span class="p">:</span>
@@ -2058,12 +2092,15 @@ table {
 
     
   
-    <div class="desc"><p>Sets the active effect to a new random effect stored on the device</p></div>
+    <div class="desc"><p>Sets the active effect to a new random effect stored on the device.</p>
+<p>Returns the name of the new effect.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.effect_random', this);">Show source &equiv;</a></p>
   <div id="source-aurora.Aurora.effect_random" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns the name of the new effect.&quot;&quot;&quot;</span>
     <span class="n">effect_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effects_list</span>
     <span class="n">active_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect</span>
     <span class="k">if</span> <span class="n">active_effect</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_effect_names</span><span class="p">:</span>
@@ -2391,6 +2428,17 @@ table {
 
             </div>
             <div class="item">
+            <p id="aurora.Aurora.firmware" class="name">var <span class="ident">firmware</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the firmware version of the device</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
             <p id="aurora.Aurora.hue" class="name">var <span class="ident">hue</span></p>
             
 
@@ -2441,6 +2489,17 @@ table {
 
             
   
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.model" class="name">var <span class="ident">model</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the model number of the device. (Always returns 'NL22')</p></div>
   <div class="source_cont">
 </div>
 
@@ -2566,6 +2625,17 @@ o - Rotational orientation</p></div>
             
   
     <div class="desc"><p>Returns the minimum saturation possible. (This always returns 0)</p></div>
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="aurora.Aurora.serial_number" class="name">var <span class="ident">serial_number</span></p>
+            
+
+            
+  
+    <div class="desc"><p>Returns the serial number of the device</p></div>
   <div class="source_cont">
 </div>
 

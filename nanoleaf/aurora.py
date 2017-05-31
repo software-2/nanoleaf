@@ -84,6 +84,21 @@ class Aurora(object):
         """Briefly flash the panels on and off"""
         self.__put("identify", {})
 
+    @property
+    def firmware(self):
+        """Returns the firmware version of the device"""
+        return self.__get("firmwareVersion")
+
+    @property
+    def model(self):
+        """Returns the model number of the device. (Always returns 'NL22')"""
+        return self.__get("model")
+
+    @property
+    def serial_number(self):
+        """Returns the serial number of the device"""
+        return self.__get("serialNo")
+
     def delete_user(self):
         """CAUTION: Revokes your auth token from the device."""
         self.__delete()
@@ -320,7 +335,9 @@ class Aurora(object):
         return self.__get("effects/effectsList")
 
     def effect_random(self) -> str:
-        """Sets the active effect to a new random effect stored on the device"""
+        """Sets the active effect to a new random effect stored on the device.
+        
+        Returns the name of the new effect."""
         effect_list = self.effects_list
         active_effect = self.effect
         if active_effect not in self._reserved_effect_names:
