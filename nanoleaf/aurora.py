@@ -319,13 +319,15 @@ class Aurora(object):
         """Returns a list of all effects stored on the device"""
         return self.__get("effects/effectsList")
 
-    def effect_random(self):
+    def effect_random(self) -> str:
         """Sets the active effect to a new random effect stored on the device"""
         effect_list = self.effects_list
         active_effect = self.effect
         if active_effect not in self._reserved_effect_names:
             effect_list.remove(self.effect)
-        self.effect = random.choice(effect_list)
+        new_effect = random.choice(effect_list)
+        self.effect = new_effect
+        return new_effect
 
     def effect_set_raw(self, effect_data: dict):
         """Sends a raw dict containing effect data to the device.

@@ -65,8 +65,7 @@ my_aurora.effect = "Violets Are Blue"
 ```python
 left_side = Aurora("192.168.1.56", "5EvbR2FjfmYfAkEtOkEnolnZbe6qOB")
 right_side = Aurora("192.168.1.78", "fAkeR2FjfmYfAkEtOkEnolnZtOkEn")
-right_side.effect_random()
-left_side.effect = rightSide.effect
+left_side.effect = right_side.effect_random()
 ```
 
 ### Add a new effect ###

@@ -1328,16 +1328,16 @@ table {
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">color_temperature_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the minimum color temperature possible. (This always returns 1200)&quot;&quot;&quot;</span>
-        <span class="c1"># return self.__get(&quot;state/ct/min&quot;)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/ct/min&quot;</span><span class="p">)</span>
         <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
-        <span class="k">return</span> <span class="mi">1200</span>
+        <span class="c1">#return 1200</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">color_temperature_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the maximum color temperature possible. (This always returns 6500)&quot;&quot;&quot;</span>
-        <span class="c1"># return self.__get(&quot;state/ct/max&quot;)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/ct/max&quot;</span><span class="p">)</span>
         <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
-        <span class="k">return</span> <span class="mi">6500</span>
+        <span class="c1">#return 6500</span>
 
     <span class="k">def</span> <span class="nf">color_temperature_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Raise the color temperature of the device by a relative amount (negative lowers color temperature)&quot;&quot;&quot;</span>
@@ -1410,13 +1410,15 @@ table {
         <span class="sd">&quot;&quot;&quot;Returns a list of all effects stored on the device&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/effectsList&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device&quot;&quot;&quot;</span>
         <span class="n">effect_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effects_list</span>
         <span class="n">active_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect</span>
         <span class="k">if</span> <span class="n">active_effect</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_effect_names</span><span class="p">:</span>
             <span class="n">effect_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effect_list</span><span class="p">)</span>
+        <span class="n">new_effect</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effect_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">new_effect</span>
+        <span class="k">return</span> <span class="n">new_effect</span>
 
     <span class="k">def</span> <span class="nf">effect_set_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sends a raw dict containing effect data to the device.</span>
@@ -1697,16 +1699,16 @@ table {
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">color_temperature_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the minimum color temperature possible. (This always returns 1200)&quot;&quot;&quot;</span>
-        <span class="c1"># return self.__get(&quot;state/ct/min&quot;)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/ct/min&quot;</span><span class="p">)</span>
         <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
-        <span class="k">return</span> <span class="mi">1200</span>
+        <span class="c1">#return 1200</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">color_temperature_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the maximum color temperature possible. (This always returns 6500)&quot;&quot;&quot;</span>
-        <span class="c1"># return self.__get(&quot;state/ct/max&quot;)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;state/ct/max&quot;</span><span class="p">)</span>
         <span class="c1"># BUG: Firmware 1.5.0 returns the wrong value.</span>
-        <span class="k">return</span> <span class="mi">6500</span>
+        <span class="c1">#return 6500</span>
 
     <span class="k">def</span> <span class="nf">color_temperature_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Raise the color temperature of the device by a relative amount (negative lowers color temperature)&quot;&quot;&quot;</span>
@@ -1779,13 +1781,15 @@ table {
         <span class="sd">&quot;&quot;&quot;Returns a list of all effects stored on the device&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get</span><span class="p">(</span><span class="s2">&quot;effects/effectsList&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device&quot;&quot;&quot;</span>
         <span class="n">effect_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effects_list</span>
         <span class="n">active_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect</span>
         <span class="k">if</span> <span class="n">active_effect</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_effect_names</span><span class="p">:</span>
             <span class="n">effect_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effect_list</span><span class="p">)</span>
+        <span class="n">new_effect</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effect_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">new_effect</span>
+        <span class="k">return</span> <span class="n">new_effect</span>
 
     <span class="k">def</span> <span class="nf">effect_set_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">effect_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sends a raw dict containing effect data to the device.</span>
@@ -2058,13 +2062,15 @@ table {
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aurora.Aurora.effect_random', this);">Show source &equiv;</a></p>
   <div id="source-aurora.Aurora.effect_random" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">effect_random</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Sets the active effect to a new random effect stored on the device&quot;&quot;&quot;</span>
     <span class="n">effect_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effects_list</span>
     <span class="n">active_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effect</span>
     <span class="k">if</span> <span class="n">active_effect</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_effect_names</span><span class="p">:</span>
         <span class="n">effect_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">effect</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effect_list</span><span class="p">)</span>
+    <span class="n">new_effect</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">effect_list</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">new_effect</span>
+    <span class="k">return</span> <span class="n">new_effect</span>
 </pre></div>
 
   </div>
