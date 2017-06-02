@@ -1,5 +1,6 @@
 import requests
 import random
+import colorsys
 
 # Primary interface for an Aurora light
 # For instructions or bug reports, please visit
@@ -271,6 +272,38 @@ class Aurora(object):
     def color_temperature_lower(self, level):
         """Lower the color temperature of the device by a relative amount (negative raises color temperature)"""
         self.color_temperature_raise(-level)
+
+    ###########################################
+    # Color RGB/HSB methods
+    ###########################################
+
+    # TODO: Shame on all these magic numbers. SHAME.
+
+    @property
+    def rgb(self):
+        """The color of the device, as represented by 0-255 RGB values"""
+        hue = self.hue
+        saturation = self.saturation
+        brightness = self.brightness
+        if hue is None or saturation is None or brightness is None:
+            return None
+        rgb = colorsys.hsv_to_rgb(hue / 360, saturation / 100, brightness / 100)
+        return [int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255)]
+
+    @rgb.setter
+    def rgb(self, color):
+        """Set the color of the device, as represented by a list of 0-255 RGB values"""
+        try:
+            red, green, blue = color
+        except ValueError:
+            print("Error: Color must have three values.")
+            return
+        hsv = colorsys.rgb_to_hsv(red / 255, green / 255, blue / 255)
+        hue = int(hsv[0] * 360)
+        saturation = int(hsv[1] * 100)
+        brightness = int(hsv[2] * 100)
+        data = {"hue": {"value": hue}, "sat": {"value": saturation}, "brightness": {"value": brightness}}
+        self.__put("state", data)
 
     ###########################################
     # Layout methods
