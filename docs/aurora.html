@@ -1092,6 +1092,7 @@ table {
     <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">colorsys</span>
+<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="c1"># Primary interface for an Aurora light</span>
 <span class="c1"># For instructions or bug reports, please visit</span>
@@ -1383,12 +1384,33 @@ table {
 
     <span class="nd">@rgb.setter</span>
     <span class="k">def</span> <span class="nf">rgb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set the color of the device, as represented by a list of 0-255 RGB values&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Set the color of the device, as represented by either a hex string or a list of 0-255 RGB values&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span> <span class="o">=</span> <span class="n">color</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Color must have three values.&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">hexcolor</span> <span class="o">=</span> <span class="n">color</span>
+                <span class="n">reg_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^([A-Fa-f0-9]{6})$&quot;</span><span class="p">,</span> <span class="n">hexcolor</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">reg_match</span><span class="p">:</span>
+                    <span class="n">red</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexcolor</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
+                    <span class="n">green</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexcolor</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
+                    <span class="n">blue</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexcolor</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:],</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Color must be in valid hex format.&quot;</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Color must have one hex value or three 0-255 values.&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">red</span> <span class="o">&lt;=</span> <span class="mi">255</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Red value out of range! (0-255)&quot;</span><span class="p">)</span>
             <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">green</span> <span class="o">&lt;=</span> <span class="mi">255</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Green value out of range! (0-255)&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">blue</span> <span class="o">&lt;=</span> <span class="mi">255</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Blue value out of range! (0-255)&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
         <span class="n">hsv</span> <span class="o">=</span> <span class="n">colorsys</span><span class="o">.</span><span class="n">rgb_to_hsv</span><span class="p">(</span><span class="n">red</span> <span class="o">/</span> <span class="mi">255</span><span class="p">,</span> <span class="n">green</span> <span class="o">/</span> <span class="mi">255</span><span class="p">,</span> <span class="n">blue</span> <span class="o">/</span> <span class="mi">255</span><span class="p">)</span>
         <span class="n">hue</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hsv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">360</span><span class="p">)</span>
         <span class="n">saturation</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hsv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
@@ -1803,12 +1825,33 @@ table {
 
     <span class="nd">@rgb.setter</span>
     <span class="k">def</span> <span class="nf">rgb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set the color of the device, as represented by a list of 0-255 RGB values&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Set the color of the device, as represented by either a hex string or a list of 0-255 RGB values&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span> <span class="o">=</span> <span class="n">color</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Color must have three values.&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">hexcolor</span> <span class="o">=</span> <span class="n">color</span>
+                <span class="n">reg_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^([A-Fa-f0-9]{6})$&quot;</span><span class="p">,</span> <span class="n">hexcolor</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">reg_match</span><span class="p">:</span>
+                    <span class="n">red</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexcolor</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
+                    <span class="n">green</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexcolor</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
+                    <span class="n">blue</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hexcolor</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:],</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Color must be in valid hex format.&quot;</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Color must have one hex value or three 0-255 values.&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">red</span> <span class="o">&lt;=</span> <span class="mi">255</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Red value out of range! (0-255)&quot;</span><span class="p">)</span>
             <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">green</span> <span class="o">&lt;=</span> <span class="mi">255</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Green value out of range! (0-255)&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">blue</span> <span class="o">&lt;=</span> <span class="mi">255</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error: Blue value out of range! (0-255)&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
         <span class="n">hsv</span> <span class="o">=</span> <span class="n">colorsys</span><span class="o">.</span><span class="n">rgb_to_hsv</span><span class="p">(</span><span class="n">red</span> <span class="o">/</span> <span class="mi">255</span><span class="p">,</span> <span class="n">green</span> <span class="o">/</span> <span class="mi">255</span><span class="p">,</span> <span class="n">blue</span> <span class="o">/</span> <span class="mi">255</span><span class="p">)</span>
         <span class="n">hue</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hsv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">360</span><span class="p">)</span>
         <span class="n">saturation</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hsv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
