@@ -1,6 +1,7 @@
 import requests
 import random
 import colorsys
+import re
 
 # Primary interface for an Aurora light
 # For instructions or bug reports, please visit
@@ -292,12 +293,33 @@ class Aurora(object):
 
     @rgb.setter
     def rgb(self, color):
-        """Set the color of the device, as represented by a list of 0-255 RGB values"""
+        """Set the color of the device, as represented by either a hex string or a list of 0-255 RGB values"""
         try:
             red, green, blue = color
         except ValueError:
-            print("Error: Color must have three values.")
+            try:
+                hexcolor = color
+                reg_match = re.match("^([A-Fa-f0-9]{6})$", hexcolor)
+                if reg_match:
+                    red = int(hexcolor[:2], 16)
+                    green = int(hexcolor[2:-2], 16)
+                    blue = int(hexcolor[-2:], 16)
+                else:
+                    print("Error: Color must be in valid hex format.")
+                    return
+            except ValueError:
+                print("Error: Color must have one hex value or three 0-255 values.")
+                return
+        if not 0 <= red <= 255:
+            print("Error: Red value out of range! (0-255)")
             return
+        if not 0 <= green <= 255:
+            print("Error: Green value out of range! (0-255)")
+            return
+        if not 0 <= blue <= 255:
+            print("Error: Blue value out of range! (0-255)")
+            return
+
         hsv = colorsys.rgb_to_hsv(red / 255, green / 255, blue / 255)
         hue = int(hsv[0] * 360)
         saturation = int(hsv[1] * 100)
