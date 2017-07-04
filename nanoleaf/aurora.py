@@ -2,10 +2,25 @@ import requests
 import random
 import colorsys
 import re
+import socket
 
 # Primary interface for an Aurora light
 # For instructions or bug reports, please visit
 # https://github.com/software-2/nanoleaf
+
+
+class AuroraStream(object):
+    def __init__(self, addr: str, port: int):
+        self.addr = (addr, port)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.settimeout(1)
+
+    def __send(self, msg: bytes):
+        self.sock.sendto(msg, self.addr)
+
+    def panel_set(self, panel_id: int, red: int, green: int, blue: int,
+                  white: int = 0, transition_time: int = 1):
+        self.__send(bytes([1, panel_id, 1, red, green, blue, white, transition_time]))
 
 
 class Aurora(object):
@@ -72,8 +87,8 @@ class Aurora(object):
 
     @property
     def info(self):
-        """Returns the full Aurora Info request. 
-        
+        """Returns the full Aurora Info request.
+
         Useful for debugging since it's just a fat dump."""
         return self.__get()
 
@@ -359,7 +374,7 @@ class Aurora(object):
     @property
     def panel_positions(self):
         """Returns a list of all panels with their attributes represented in a dict.
-        
+
         panelId - Unique identifier for this panel
         x - X-coordinate
         y - Y-coordinate
@@ -391,7 +406,7 @@ class Aurora(object):
 
     def effect_random(self) -> str:
         """Sets the active effect to a new random effect stored on the device.
-        
+
         Returns the name of the new effect."""
         effect_list = self.effects_list
         active_effect = self.effect
@@ -406,7 +421,7 @@ class Aurora(object):
 
         The dict given must match the json structure specified in the API docs."""
         data = {"write": effect_data}
-        self.__put("effects", data)
+        return self.__put("effects", data)
 
     def effect_details(self, name: str) -> dict:
         """Returns the dict containing details for the effect specified"""
@@ -431,3 +446,11 @@ class Aurora(object):
                           "animName": old_name,
                           "newName": new_name}}
         self.__put("effects", data)
+
+    def effect_stream(self):
+        """Open an external control stream"""
+        data = {"write": {"command":  "display",
+                          "animType": "extControl"}}
+
+        udp_info = self.__put("effects", data)
+        return AuroraStream(udp_info["streamControlIpAddr"], udp_info["streamControlPort"])
