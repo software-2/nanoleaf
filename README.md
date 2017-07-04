@@ -111,7 +111,7 @@ effect_data = {
     "loop": True
 }
 
-my_aurora.effect_add_raw(effect_data)
+my_aurora.effect_set_raw(effect_data)
 ```
 
 ### Delete an effect ###
