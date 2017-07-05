@@ -11,6 +11,7 @@ import socket
 
 class AuroraStream(object):
     def __init__(self, addr: str, port: int):
+        self._prepare = []
         self.addr = (addr, port)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.settimeout(1)
@@ -20,7 +21,17 @@ class AuroraStream(object):
 
     def panel_set(self, panel_id: int, red: int, green: int, blue: int,
                   white: int = 0, transition_time: int = 1):
-        self.__send(bytes([1, panel_id, 1, red, green, blue, white, transition_time]))
+        b = bytes([1, panel_id, 1, red, green, blue, white, transition_time])
+        self.__send(b)
+
+    def panel_prepare(self, panel_id: int, red: int, green: int, blue: int,
+                      white: int = 0, transition_time: int = 1):
+        self._prepare = self._prepare + [panel_id, 1, red, green, blue, white, transition_time]
+
+    def panel_strobe(self):
+        data = [len(self._prepare)] + self._prepare
+        self._prepare = []
+        self.__send(bytes(data))
 
 
 class Aurora(object):
