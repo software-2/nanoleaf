@@ -28,6 +28,12 @@ def find_auroras(seek_time: float = 30):
     req = '\r\n'.join(req).encode('utf-8')
 
     aurora_locations = []
+    broken_auroras = []
+
+    def get_deviceid(r):
+        for line in r.split("\n"):
+            if "deviceid:" in line:
+                return line.replace("nl-deviceid:", "").strip()
     
     def check_if_new_aurora(r):
         if SSDP_ST not in r:
@@ -38,8 +44,15 @@ def find_auroras(seek_time: float = 30):
                                   .replace("http://", "") \
                                   .replace(":16021", "")
                 if new_location not in aurora_locations:
+                    # BUG: As of firmware 2.1.0, the Aurora's Location may not include an IP address.
+                    if new_location == "":
+                        broken = get_deviceid(r)
+                        if broken not in broken_auroras:
+                            broken_auroras.append(broken)
+                            print("New Aurora found (deviceid: " + broken + "). But the device does not have an IP address.")
+                        return
                     aurora_locations.append(new_location)
-                    print("New Aurora found at " + new_location)
+                    print("New Aurora found at " + new_location + " - deviceid:" + get_deviceid(r))
                 return
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
