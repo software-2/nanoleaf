@@ -46,7 +46,7 @@ class Aurora(object):
 
     def __check_for_errors(self, r: requests.request) -> requests.request:
         if r.status_code == 200:
-            if r.text == "":  # BUG: Delete User returns 200, not 204 like it should, as of firmware 1.5.0
+            if r.text == "":  # BUG: Identify returns 200, not 204 like it should, as of firmware 2.2.0
                 return None
             return r.json()
         elif r.status_code == 204:
@@ -89,17 +89,17 @@ class Aurora(object):
     @property
     def firmware(self):
         """Returns the firmware version of the device"""
-        return self.__get("firmwareVersion")
+        return self.__get()['firmwareVersion']
 
     @property
     def model(self):
         """Returns the model number of the device. (Always returns 'NL22')"""
-        return self.__get("model")
+        return self.__get()['model']
 
     @property
     def serial_number(self):
         """Returns the serial number of the device"""
-        return self.__get("serialNo")
+        return self.__get()['serialNo']
 
     def delete_user(self):
         """CAUTION: Revokes your auth token from the device."""
@@ -254,16 +254,12 @@ class Aurora(object):
     @property
     def color_temperature_min(self):
         """Returns the minimum color temperature possible. (This always returns 1200)"""
-        # return self.__get("state/ct/min")
-        # BUG: Firmware 1.5.0 returns the wrong value.
-        return 1200
+        return self.__get("state/ct/min")
 
     @property
     def color_temperature_max(self):
         """Returns the maximum color temperature possible. (This always returns 6500)"""
-        # return self.__get("state/ct/max")
-        # BUG: Firmware 1.5.0 returns the wrong value.
-        return 6500
+        return self.__get("state/ct/max")
 
     def color_temperature_raise(self, level):
         """Raise the color temperature of the device by a relative amount (negative lowers color temperature)"""
@@ -349,7 +345,11 @@ class Aurora(object):
     @property
     def panel_count(self):
         """Returns the number of panels connected to the device"""
-        return self.__get("panelLayout/layout/numPanels")
+        # Firmware 2.2.0 has a bug where the rhythm module is added to the panel count.
+        count = int(self.__get("panelLayout/layout/numPanels"))
+        if self.rhythm_connected:
+            count -= 1
+        return count
 
     @property
     def panel_length(self):
@@ -431,3 +431,58 @@ class Aurora(object):
                           "animName": old_name,
                           "newName": new_name}}
         self.__put("effects", data)
+
+    ###########################################
+    # Rhythm methods
+    ###########################################
+
+    @property
+    def rhythm_connected(self):
+        """Returns True if the rhythm module is connected, False if it's not"""
+        return self.__get("rhythm/rhythmConnected")
+
+    @property
+    def rhythm_active(self):
+        """Returns True if the rhythm microphone is active, False if it's not"""
+        return self.__get("rhythm/rhythmActive")
+
+    @property
+    def rhythm_id(self):
+        """Returns the ID of the rhythm module"""
+        return self.__get("rhythm/rhythmId")
+
+    @property
+    def rhythm_hardware_version(self):
+        """Returns the hardware version of the rhythm module"""
+        return self.__get("rhythm/hardwareVersion")
+
+    @property
+    def rhythm_firmware_version(self):
+        """Returns the firmware version of the rhythm module"""
+        return self.__get("rhythm/firmwareVersion")
+
+    @property
+    def rhythm_aux_available(self):
+        """Returns True if an aux cable is connected to the rhythm module, False if it's not"""
+        return self.__get("rhythm/auxAvailable")
+
+    @property
+    def rhythm_mode(self):
+        """Returns the sound source of the rhythm module. 0 for microphone, 1 for aux cable"""
+        return self.__get("rhythm/rhythmMode")
+
+    @rhythm_mode.setter
+    def rhythm_mode(self, value):
+        """Set the sound source of the rhythm module. 0 for microphone, 1 for aux cable"""
+        data = {"rhythmMode": value}
+        self.__put("rhythm", data)
+
+    @property
+    def rhythm_position(self):
+        """Returns the position and orientation of the rhythm module represented in a dict.
+
+        x - X-coordinate
+        y - Y-coordinate
+        o - Rotational orientation
+        """
+        return self.__get("rhythm/rhythmPos")
