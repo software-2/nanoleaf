@@ -15,11 +15,13 @@ LTC: Lajqnm28UipLbzJqvyy4tRQFf39xQy6B48
 
 ## Install ##
 
-It's super easy - just use pip to get the latest version.
+It's super easy - just use pip to get the latest version (Python 3 is **required**):
 
 ```
 pip install nanoleaf --upgrade
 ```
+
+If you get an error similar to `Command '['git', 'tag', '-l', '--points-at', 'HEAD']' returned non-zero exit status 128`, this is because you attempted an installation using pip from Python 2.
 
 ## Setup ##
 
