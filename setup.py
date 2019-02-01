@@ -8,7 +8,7 @@ setup(
     packages=['nanoleaf'],
     version=gitVersion,
     description='Python interface for Nanoleaf Aurora.',
-    long_description=open('README.rst', 'r').read(),
+    long_description=open('README.md', 'r').read(),
     author='Anthony Bryan',
     author_email='projects@anthonybryan.net',
     url='https://github.com/software-2/nanoleaf',

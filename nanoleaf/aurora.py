@@ -2,10 +2,36 @@ import requests
 import random
 import colorsys
 import re
+import socket
 
 # Primary interface for an Aurora light
 # For instructions or bug reports, please visit
 # https://github.com/software-2/nanoleaf
+
+
+class AuroraStream(object):
+    def __init__(self, addr: str, port: int):
+        self._prepare = []
+        self.addr = (addr, port)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.settimeout(1)
+
+    def __send(self, msg: bytes):
+        self.sock.sendto(msg, self.addr)
+
+    def panel_set(self, panel_id: int, red: int, green: int, blue: int,
+                  white: int = 0, transition_time: int = 1):
+        b = bytes([1, panel_id, 1, red, green, blue, white, transition_time])
+        self.__send(b)
+
+    def panel_prepare(self, panel_id: int, red: int, green: int, blue: int,
+                      white: int = 0, transition_time: int = 1):
+        self._prepare = self._prepare + [panel_id, 1, red, green, blue, white, transition_time]
+
+    def panel_strobe(self):
+        data = [len(self._prepare)] + self._prepare
+        self._prepare = []
+        self.__send(bytes(data))
 
 
 class Aurora(object):
@@ -46,7 +72,7 @@ class Aurora(object):
 
     def __check_for_errors(self, r: requests.request) -> requests.request:
         if r.status_code == 200:
-            if r.text == "":  # BUG: Delete User returns 200, not 204 like it should, as of firmware 1.5.0
+            if r.text == "":  # BUG: Identify returns 200, not 204 like it should, as of firmware 2.2.0
                 return None
             return r.json()
         elif r.status_code == 204:
@@ -72,8 +98,8 @@ class Aurora(object):
 
     @property
     def info(self):
-        """Returns the full Aurora Info request. 
-        
+        """Returns the full Aurora Info request.
+
         Useful for debugging since it's just a fat dump."""
         return self.__get()
 
@@ -89,17 +115,17 @@ class Aurora(object):
     @property
     def firmware(self):
         """Returns the firmware version of the device"""
-        return self.__get("firmwareVersion")
+        return self.__get()['firmwareVersion']
 
     @property
     def model(self):
         """Returns the model number of the device. (Always returns 'NL22')"""
-        return self.__get("model")
+        return self.__get()['model']
 
     @property
     def serial_number(self):
         """Returns the serial number of the device"""
-        return self.__get("serialNo")
+        return self.__get()['serialNo']
 
     def delete_user(self):
         """CAUTION: Revokes your auth token from the device."""
@@ -254,16 +280,12 @@ class Aurora(object):
     @property
     def color_temperature_min(self):
         """Returns the minimum color temperature possible. (This always returns 1200)"""
-        # return self.__get("state/ct/min")
-        # BUG: Firmware 1.5.0 returns the wrong value.
-        return 1200
+        return self.__get("state/ct/min")
 
     @property
     def color_temperature_max(self):
         """Returns the maximum color temperature possible. (This always returns 6500)"""
-        # return self.__get("state/ct/max")
-        # BUG: Firmware 1.5.0 returns the wrong value.
-        return 6500
+        return self.__get("state/ct/max")
 
     def color_temperature_raise(self, level):
         """Raise the color temperature of the device by a relative amount (negative lowers color temperature)"""
@@ -349,7 +371,11 @@ class Aurora(object):
     @property
     def panel_count(self):
         """Returns the number of panels connected to the device"""
-        return self.__get("panelLayout/layout/numPanels")
+        # Firmware 2.2.0 has a bug where the rhythm module is added to the panel count.
+        count = int(self.__get("panelLayout/layout/numPanels"))
+        if self.rhythm_connected:
+            count -= 1
+        return count
 
     @property
     def panel_length(self):
@@ -359,7 +385,7 @@ class Aurora(object):
     @property
     def panel_positions(self):
         """Returns a list of all panels with their attributes represented in a dict.
-        
+
         panelId - Unique identifier for this panel
         x - X-coordinate
         y - Y-coordinate
@@ -391,7 +417,7 @@ class Aurora(object):
 
     def effect_random(self) -> str:
         """Sets the active effect to a new random effect stored on the device.
-        
+
         Returns the name of the new effect."""
         effect_list = self.effects_list
         active_effect = self.effect
@@ -406,7 +432,7 @@ class Aurora(object):
 
         The dict given must match the json structure specified in the API docs."""
         data = {"write": effect_data}
-        self.__put("effects", data)
+        return self.__put("effects", data)
 
     def effect_details(self, name: str) -> dict:
         """Returns the dict containing details for the effect specified"""
@@ -431,3 +457,66 @@ class Aurora(object):
                           "animName": old_name,
                           "newName": new_name}}
         self.__put("effects", data)
+
+    def effect_stream(self):
+        """Open an external control stream"""
+        data = {"write": {"command":  "display",
+                          "animType": "extControl"}}
+
+        udp_info = self.__put("effects", data)
+        return AuroraStream(udp_info["streamControlIpAddr"], udp_info["streamControlPort"])
+
+    ###########################################
+    # Rhythm methods
+    ###########################################
+
+    @property
+    def rhythm_connected(self):
+        """Returns True if the rhythm module is connected, False if it's not"""
+        return self.__get("rhythm/rhythmConnected")
+
+    @property
+    def rhythm_active(self):
+        """Returns True if the rhythm microphone is active, False if it's not"""
+        return self.__get("rhythm/rhythmActive")
+
+    @property
+    def rhythm_id(self):
+        """Returns the ID of the rhythm module"""
+        return self.__get("rhythm/rhythmId")
+
+    @property
+    def rhythm_hardware_version(self):
+        """Returns the hardware version of the rhythm module"""
+        return self.__get("rhythm/hardwareVersion")
+
+    @property
+    def rhythm_firmware_version(self):
+        """Returns the firmware version of the rhythm module"""
+        return self.__get("rhythm/firmwareVersion")
+
+    @property
+    def rhythm_aux_available(self):
+        """Returns True if an aux cable is connected to the rhythm module, False if it's not"""
+        return self.__get("rhythm/auxAvailable")
+
+    @property
+    def rhythm_mode(self):
+        """Returns the sound source of the rhythm module. 0 for microphone, 1 for aux cable"""
+        return self.__get("rhythm/rhythmMode")
+
+    @rhythm_mode.setter
+    def rhythm_mode(self, value):
+        """Set the sound source of the rhythm module. 0 for microphone, 1 for aux cable"""
+        data = {"rhythmMode": value}
+        self.__put("rhythm", data)
+
+    @property
+    def rhythm_position(self):
+        """Returns the position and orientation of the rhythm module represented in a dict.
+
+        x - X-coordinate
+        y - Y-coordinate
+        o - Rotational orientation
+        """
+        return self.__get("rhythm/rhythmPos")
