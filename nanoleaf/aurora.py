@@ -117,7 +117,7 @@ class Aurora(object):
     @on.setter
     def on(self, value: bool):
         """Turns the device on/off. True = on, False = off"""
-        data = {"on": value}
+        data = {"on": {"value": value}}
         self.__put("state", data)
 
     @property
